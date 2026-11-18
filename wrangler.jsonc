@@ -1,0 +1,15 @@
+{
+  // 동의서 서명받기 · Cloudflare Workers 설정
+  // name 은 Cloudflare 화면의 '프로젝트 이름'과 똑같아야 합니다. (다르면 배포가 실패합니다)
+  "name": "sign",
+  "main": "worker.js",
+  "compatibility_date": "2026-06-01",
+  // 화면 파일(public 폴더)을 그대로 내보내고, 거기에 없는 주소(/api)만 worker.js 가 받습니다.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "workers_dev": true,
+  // Cloudflare 화면에서 넣은 변수·비밀(GAS_URL)을 배포할 때 지우지 않습니다.
+  "keep_vars": true
+}
