@@ -200,9 +200,9 @@ table.t{width:100%;border-collapse:collapse;font-size:14px}
 .imgs figure{margin:0;position:relative}
 .imgs img{height:90px;width:auto;border-radius:8px;border:1px solid var(--line);display:block}
 .imgs button{position:absolute;top:4px;right:4px}
-.qr{width:168px;height:168px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;flex:none}
+.qr{width:176px;height:176px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:2px;flex:none}
 .qr svg{width:100%;height:100%;display:block}
-.qr.sm{width:132px;height:132px;padding:6px}
+.qr.sm{width:156px;height:156px;padding:2px}
 .qrbox{display:flex;gap:14px;align-items:center;border:1px dashed var(--line2);border-radius:12px;padding:12px 14px;background:var(--surface)}
 .qrbox b{font-size:15px}
 .qrbox .hint{margin-top:3px}
@@ -210,6 +210,34 @@ table.t{width:100%;border-collapse:collapse;font-size:14px}
 .linkbox{font:500 13px/1.5 var(--f-mono);background:var(--sunk);border-radius:8px;padding:9px 11px;overflow-wrap:anywhere;user-select:all}
 ol.how{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.6}
 .codebox{max-height:220px;overflow:auto;background:var(--sunk);border-radius:8px;padding:10px;font:12px/1.5 var(--f-mono);white-space:pre;user-select:all}
+
+/* PDF 서식: 칸 맞추기 */
+.pfed{position:relative;width:100%;border:1px solid var(--line2);background:#fff;cursor:crosshair;user-select:none;-webkit-user-select:none;touch-action:manipulation;line-height:0;box-shadow:var(--shadow)}
+.pfed img{display:block;width:100%;height:auto;pointer-events:none;-webkit-user-drag:none}
+.pfb,.pfr,.pfdrag{position:absolute;pointer-events:none;box-sizing:border-box}
+.pfb{border:2px solid #C4372B;background:rgba(196,55,43,.16);color:#8A1F16;font:700 11px/1 var(--f-ui);font-style:normal;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap}
+.pfb.st{border-color:#1F4E79;background:rgba(31,78,121,.16);color:#1F4E79}
+.pfr{border:1px dashed rgba(196,55,43,.6);background:rgba(196,55,43,.05)}
+.pfdrag{border:2px dashed #1F4E79;background:rgba(31,78,121,.12)}
+.pfrow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.pfrow .in{width:78px;min-height:32px;padding:4px 6px;font-size:13px}
+.pnqr svg{display:block;width:100%;height:100%}
+/* PDF 서식: 끌어다 놓기 */
+.pfdrop{position:relative}
+.pfdrop.drag{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-soft)}
+.pfdrop.drag::after{content:attr(data-drop);position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;border-radius:12px;background:rgba(31,78,121,.88);color:#fff;font:700 18px/1.4 var(--f-ui);pointer-events:none}
+.pfzone{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 16px;border:2px dashed var(--line2);border-radius:12px;background:rgba(127,127,127,.06);text-align:center}
+.pfzone b{font-size:15px}
+/* PDF 서식: 넣을 칸 목록 */
+.pfgrp{display:flex;flex-direction:column;gap:6px}
+.pfhead{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;justify-content:space-between}
+.pfc{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.pfc.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.pfc .in{min-height:34px;padding:4px 8px;font-size:14px}
+.pfc .nm{width:150px;font-weight:600}
+.pfc .tx{flex:1 1 150px;width:150px;max-width:260px}
+.pfc .au{width:auto}
+.pfc textarea.in{width:100%}
 
 /* 창·알림 */
 .modal{position:fixed;inset:0;z-index:60;background:var(--scrim);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -322,16 +350,30 @@ var LIC = (function () {
 })();
 
 /* ===== 동의서 서명받기 · 화면 프로그램 (1/3: 기본·저장·서식 그리기) ===== */
-const EDITION = '배포용', APP_VER = '1.2.4', APP_DATE = '2026-11-16', APP_NAME = '동의서 서명받기';
+const EDITION = '배포용', APP_VER = '1.7.0', APP_DATE = '2026-11-18', APP_NAME = '동의서 서명받기';
 const PERSONAL = EDITION === '개인용';
 const HOTLINE_URL = 'https://script.google.com/macros/s/AKfycbx-I8Ru5kbIdsFdiT3nzccdgWk_t7lFmBi3u4YJ_jOo2VOh6bO6csAsImev_D5UF8i8/exec';   /* 공장장 핫라인 대나무숲(사용 신청 창) */
 const BOOT = window.SIGN_BOOT || {};
 let QS; try { QS = new URLSearchParams(location.search); } catch (e) { QS = new URLSearchParams(''); }
 const GAS = !!(BOOT.gas && window.google && window.google.script && window.google.script.run);
+/* ▼ 구글 시트 서버 주소(Apps Script › 배포 › 배포 관리 › 웹 앱 URL, …/exec)를 따옴표 안에 붙여 넣으세요.
+   적어 두면 휴대폰·아이패드·PC 어디서 GitHub 주소만 열어도 같은 구글 시트에 연결되고, 같은 서명철 목록·같은 QR이 나옵니다. */
+const DEFAULT_API = '';
+/* ▼ Cloudflare Pages에 올리면 같은 주소의 /api (저장소의 functions/api.js)가 구글 시트 서버로 이어 준다.
+   서버 주소는 Cloudflare의 환경 변수(GAS_URL)에만 두므로 이 파일·주소창·QR 어디에도 드러나지 않고, 어느 기기에서 열어도 같은 구글 시트에 연결된다.
+   ….pages.dev 가 아닌 나만의 도메인을 붙였다면 그 도메인을 PROXY_HOSTS 에 적는다. 예: ['sign.example.kr'] */
+const PROXY_HOSTS = [];
+const PROXY = location.protocol === 'https:' && (/\.pages\.dev$/i.test(location.hostname) || PROXY_HOSTS.indexOf(location.hostname) >= 0) ? location.origin + '/api' : '';
 let API = '';
-{ const s = QS.get('s'), a = QS.get('api');
+{ const s = QS.get('s'), a = QS.get('api'), okA = u => /^(https:\/\/script\.google\.com\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(String(u || ''));
   if (s && /^[\w-]{20,}$/.test(s)) API = 'https://script.google.com/macros/s/' + s + '/exec';
-  else if (a && /^(https:\/\/script\.google\.com\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(a)) API = a; }
+  else if (okA(a)) API = a;
+  if (API) { try { localStorage.setItem('dsign-api', API); } catch (e) { } }
+  else if (!QS.has('local')) {
+    /* 기본 서버가 적혀 있으면 기기에 남은 예전 주소보다 앞선다 → 어느 기기에서 열어도 같은 서버 */
+    if (PROXY) API = PROXY;                       /* Cloudflare가 이어 주는 서버 (예전 QR의 ?s= 주소는 위에서 먼저 쓰인다) */
+    else if (okA(DEFAULT_API)) API = DEFAULT_API;
+    else { let m = ''; try { m = localStorage.getItem('dsign-api') || ''; } catch (e) { } API = okA(m) ? m : ''; } } }
 const framed = (() => { try { return window.top !== window.self; } catch (e) { return true; } })();
 const SERVER = GAS || !!API;            /* 구글 시트 서버에 연결된 화면 */
 const IN_ART = framed && !SERVER;       /* claude.ai 화면: 이 기기에 저장, 인쇄 창 대신 PDF */
@@ -373,6 +415,42 @@ function defCfg() {
       title: '2027학년도 연구학교 공모 동의 안내', body: '우리 학교는 2027학년도 연구학교 공모에 참여하고자 합니다.\n\n연구학교 운영 취지와 계획을 읽어 보시고, 동의하시는 선생님께서는 아래 [동의하고 서명하기]를 눌러 서명해 주시기 바랍니다.\n\n※ 서명은 「2027학년도 연구학교 공모 동의서」 제출 용도로만 사용합니다.', images: [], agree: '위 내용을 읽고 이해했으며, 이에 동의합니다.' },
     tpl: clone(PRESETS.research.tpl) };
 }
+/* PDF 서식: {src(쪽 그림), pw·ph(쪽 크기 px), per(한 단의 줄 수), blocks(단 수), dy(줄 간격), dx(단 간격),
+     fields:[{k, x, y, w, h}]  사람마다 되풀이되는 칸(첫 번째 사람 자리) · k = seq·position·name·sign·x1~x6 (서식 설정의 '표의 칸'과 같은 칸)
+     st:[{n, t, on, x, y, w, h}] 한 번만 넣는 글자 · n 이름, t 넣을 글자({학교} 같은 자동 값 가능), on 자리를 잡았는지} */
+const PF_ST = [['{학교}', '학교명'], ['{전체}', '전체 인원'], ['{동의}', '서명 인원'], ['{율}', '동의율'], ['{오늘}', '오늘 날짜']];
+function normPdf(p) {
+  if (!p || typeof p !== 'object') return null; const src = safeImg(p.src); if (!src) return null;
+  const num = (v, a, b, d) => { v = +v; return isFinite(v) ? Math.max(a, Math.min(b, v)) : d; }, r1 = v => Math.round(v * 10) / 10;
+  const pw = Math.round(num(p.pw, 300, 1123, 794)), ph = Math.round(num(p.ph, 300, 1123, 1123)), seen = {};
+  const rect = f => { const w = r1(num(f.w, 6, pw, 60)), h = r1(num(f.h, 6, ph, 20)); return { x: r1(num(f.x, 0, pw - w, 0)), y: r1(num(f.y, 0, ph - h, 0)), w, h }; };
+  const raw = (Array.isArray(p.fields) ? p.fields : []).filter(f => f && typeof f === 'object');
+  const fields = raw.filter(f => { if (!/^(seq|position|name|sign|x[1-6])$/.test(f.k) || seen[f.k]) return false; seen[f.k] = 1; return true; }).map(f => Object.assign({ k: f.k }, rect(f)));
+  /* 예전 판(v1.5)은 한 번만 넣는 글자를 fields 안에 k:'st' 로 두었다 → st 목록으로 옮겨 받는다 */
+  const st = (Array.isArray(p.st) ? p.st : []).filter(x => x && typeof x === 'object').map(x => Object.assign({ n: String(x.n == null ? '' : x.n).slice(0, 20), t: String(x.t == null ? '' : x.t).slice(0, 60), on: !!x.on }, rect(x)))
+    .concat(raw.filter(f => f.k === 'st' && f.t).map(f => Object.assign({ n: (PF_ST.find(x => x[0] === f.t) || [])[1] || '', t: String(f.t).slice(0, 60), on: true }, rect(f)))).slice(0, 20);
+  st.forEach(x => { if (!x.t.trim()) x.on = false; });
+  return { src, name: String(p.name || 'PDF 서식').slice(0, 80), pw, ph, per: Math.round(num(p.per, 1, 60, 1)), blocks: Math.round(num(p.blocks, 1, 3, 1)), dy: r1(num(p.dy, 0, ph, 0)), dx: r1(num(p.dx, 0, pw, 0)), fields, st };
+}
+/* 구글 시트 서버는 '설정'을 글자 수 한도 안에서만 받고, 큰 그림은 안내문 첨부 자리로 따로 간직한다.
+   그래서 서버로 보낼 때는 PDF 서식 그림을 첨부 목록의 맨 끝으로 옮기고 서식에는 그 그림의 지문(ref)만 남기며, 읽을 때 지문이 맞는 첨부를 찾아 되돌린다.
+   화면 안(S.cfg)·이 기기 저장·백업 파일에서는 언제나 서식 그림이 tpl.pdf.src 에 들어 있다. */
+const PF_MEDIA = 'PDF 서식 바탕 (지우지 마세요)';
+function imgRef(src) { let h = 0x811c9dc5; for (let i = 0; i < src.length; i++) { h ^= src.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return src.length.toString(36) + '-' + h.toString(36); }
+function packCfg(cfg) {
+  const P = cfg && cfg.tpl && cfg.tpl.pdf; if (!P || !P.src) return cfg;
+  const o = Object.assign({}, cfg), pdf = Object.assign({}, P, { ref: imgRef(P.src) }); delete pdf.src;
+  o.tpl = Object.assign({}, cfg.tpl, { pdf });
+  o.notice = Object.assign({}, cfg.notice, { media: ((cfg.notice && cfg.notice.media) || []).concat([{ t: 'img', src: P.src, name: PF_MEDIA, w: 100, align: 'center', cap: '' }]) });
+  return o;
+}
+function unpackCfg(c) {
+  const P = c && c.tpl && c.tpl.pdf; if (!P || typeof P !== 'object' || P.src || !c.notice || !Array.isArray(c.notice.media)) return c;
+  const L = c.notice.media, src = m => (m && typeof m === 'object' && typeof m.src === 'string' ? m.src : '');
+  let i = P.ref ? L.findIndex(m => src(m) && imgRef(src(m)) === P.ref) : -1; if (i < 0) i = L.findIndex(m => src(m) && m.name === PF_MEDIA); if (i < 0) return c;
+  const o = Object.assign({}, c); o.tpl = Object.assign({}, c.tpl, { pdf: Object.assign({}, P, { src: src(L[i]) }) }); o.notice = Object.assign({}, c.notice, { media: L.filter((m, j) => j !== i) });
+  return o;
+}
 function normTpl(t) {
   const d = PRESETS.research.tpl; t = Object.assign({}, clone(d), t && typeof t === 'object' ? t : {});
   let cols = (Array.isArray(t.cols) ? t.cols : []).filter(c => c && typeof c === 'object').map(c => ({ k: String(c.k || ''), type: ['seq', 'sel', 'name', 'text', 'sign'].includes(c.type) ? c.type : 'text', label: String(c.label || '').slice(0, 20), w: Math.max(3, Math.min(60, +c.w || 12)), opts: Array.isArray(c.opts) ? c.opts.map(o => String(o).slice(0, 30)).filter(Boolean).slice(0, 40) : undefined }));
@@ -389,6 +467,7 @@ function normTpl(t) {
     ['titleSize', 'headSize', 'cellSize', 'stmtSize', 'dateSize', 'signerSize', 'recipSize'].forEach(k => { L[k] = cl(L[k], 8, 48, LAYD[k]); });
     ['titleGap', 'gapTable', 'gapDate', 'gapSigner', 'gapRecip'].forEach(k => { L[k] = cl(L[k], 0, 120, LAYD[k]); });
     t.lay = L; }
+  { const p = normPdf(t.pdf); if (p) { const has = {}; cols.forEach(c => { has[c.k] = 1; }); p.fields = p.fields.filter(f => has[f.k]); t.pdf = p; } else delete t.pdf; }   /* 빠진 칸의 자리는 함께 지운다 */
   ['sumCols', 'sumVals'].forEach(k => { t[k] = (Array.isArray(t[k]) ? t[k] : d[k]).slice(0, 4).map(v => String(v == null ? '' : v).slice(0, 30)); while (t[k].length < 4) t[k].push(''); });
   ['formNo', 'title', 'note', 'statement', 'date', 'signer', 'recipient'].forEach(k => { t[k] = String(t[k] == null ? '' : t[k]).slice(0, 120); });
   return t;
@@ -405,7 +484,7 @@ function normMedia(list) {
   }).filter(Boolean).slice(0, 6);
 }
 function normCfg(c) {
-  const d = defCfg(); c = c && typeof c === 'object' ? c : {}; const o = Object.assign({}, d, c);
+  const d = defCfg(); c = unpackCfg(c && typeof c === 'object' ? c : {}); const o = Object.assign({}, d, c);
   o.notice = Object.assign({}, d.notice, c.notice || {}); o.notice.media = normMedia(c.notice && (c.notice.media && c.notice.media.length ? c.notice.media : c.notice.images)); o.notice.images = [];
   o.deadline = /^\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?$/.test(String(c.deadline || '')) ? String(c.deadline) : '';
   o.maker = { name: String((c.maker && c.maker.name) || MAKER_DEF.name).slice(0, 30), org: String((c.maker && c.maker.org) || MAKER_DEF.org).slice(0, 40) };
@@ -430,7 +509,7 @@ const saveBooks = a => LS.set(LBOOKS, JSON.stringify(a));
 const devPw = () => LS.get('dsign-admin') || '';   /* 이 기기의 관리자 암호(해시) */
 function localCount(id) { try { const o = JSON.parse(LS.get(LKEY + ':' + id) || 'null'); return o && Array.isArray(o.sigs) ? o.sigs.length : 0; } catch (e) { return 0; } }
 function loadLocal(id) {
-  LBID = id; S = { cfg: defCfg(), roster: [], sigs: [], count: 0, rosterN: 0 }; ADMIN = false; resetSigner();
+  LBID = id; S = { cfg: normCfg(defCfg()), roster: [], sigs: [], count: 0, rosterN: 0 }; ADMIN = false; resetSigner();   /* 새 서명철도 빠진 값 없이 시작한다 */
   try { const o = JSON.parse(LS.get(LKEY + ':' + id) || 'null'); if (o && typeof o === 'object') { S.cfg = normCfg(o.cfg); S.roster = Array.isArray(o.roster) ? o.roster : []; S.sigs = Array.isArray(o.sigs) ? o.sigs.filter(s => s && s.id && Array.isArray(s.strokes)) : []; sortSigs(); } } catch (e) { }
   const b = localBooks().find(x => x.id === id); BOOK = { title: (b && b.title) || '', until: '' }; LS.set(LCUR, id);
 }
@@ -441,9 +520,10 @@ function saveLocal() {
 }
 function vLocalLanding() {
   const a = localBooks();
-  return `<main class="wrap narrow"><section class="sheet"><h2>동의서(서명철) 고르기</h2><p class="hint">동의서 종류마다 서명철을 따로 둡니다. 안내문·서식·명단·서명이 서명철마다 따로 저장됩니다. (이 기기에 저장) 서명철 삭제는 그 서명철의 [관리자] → 연결·저장에서 합니다.</p>
-  <div class="blist">${a.length ? a.map(b => `<div class="bitem"><div><b>${esc(b.title || '제목 없는 동의서')}</b><div class="hint">만든 날 ${fmtT(b.created)} · 서명 ${localCount(b.id)}명</div></div><div class="row"><button class="btn pri sm" data-act="lopen" data-id="${esc(b.id)}">열기</button></div></div>`).join('') : '<p class="muted">아직 서명철이 없습니다. [🔑 관리자] → 서명철 관리에서 만들어 주세요.</p>'}</div></section>
-  <p class="hint">새 서명철 만들기·제목 바꾸기·삭제는 오른쪽 위 <b>🔑 관리자</b> → <b>서명철 관리</b>에서 합니다.</p></main>`;
+  return `<main class="wrap narrow"><section class="sheet"><h2>동의서(서명철) 고르기</h2><p class="hint">동의서 종류마다 서명철을 따로 둡니다. 안내문·서식·명단·서명이 서명철마다 따로 저장됩니다. <b>지금은 이 기기에만 저장</b>되어 다른 휴대폰·아이패드에서는 보이지 않습니다. 구글 시트에 모으려면 🔑 관리자 → 서명철 관리 → ‘구글 시트 서버로 연결’을 쓰세요. 서명철 삭제는 그 서명철의 [관리자] → 연결·저장에서 합니다.</p>
+  <div class="blist">${a.length ? a.map(b => `<div class="bitem"><div><b>${esc(b.title || '제목 없는 동의서')}</b><div class="hint">만든 날 ${fmtT(b.created)} · 서명 ${localCount(b.id)}명</div></div><div class="row"><button class="btn pri sm" data-act="lopen" data-id="${esc(b.id)}">열기</button><button class="btn sm" data-act="lQr">📱 QR코드</button></div></div>`).join('') : '<p class="muted">아직 서명철이 없습니다. [🔑 관리자] → 서명철 관리에서 만들어 주세요.</p>'}</div></section>
+  <p class="hint">새 서명철 만들기·제목 바꾸기·삭제는 오른쪽 위 <b>🔑 관리자</b> → <b>서명철 관리</b>에서 합니다.</p>
+  ${helpBox()}</main>`;
 }
 const nSigs = () => (SERVER && !ADMIN) ? (S.count || 0) : S.sigs.length;
 const nRoster = () => (SERVER && !ADMIN) ? (S.rosterN || 0) : S.roster.length;
@@ -451,21 +531,30 @@ const nRoster = () => (SERVER && !ADMIN) ? (S.rosterN || 0) : S.roster.length;
 /* ---------- 서버 부르기 ---------- */
 function mkErr(j) { const e = new Error((j && j.error) || '요청이 처리되지 않았습니다.'); e.code = j && j.code; return e; }
 function call(action, data) {
-  const body = Object.assign({ action, pid: PID }, data || {}); if (TOKEN && !body.token) body.token = TOKEN;
+  const body = Object.assign({ action, pid: PID }, data || {}); if (TOKEN && !body.token) body.token = TOKEN; if (body.cfg) body.cfg = packCfg(body.cfg);
   if (GAS) return new Promise((res, rej) => google.script.run.withSuccessHandler(j => j && j.ok ? res(j) : rej(mkErr(j))).withFailureHandler(e => rej(new Error((e && e.message) || String(e)))).api(body));
   const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 30000);
   return fetch(API, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, signal: ctrl.signal, redirect: 'follow' })
-    .then(r => r.json().catch(() => { throw new Error('서버 응답을 읽지 못했습니다. 연결 주소를 확인해 주세요.'); }))
+    .then(r => r.json().catch(() => { throw new Error(PROXY && API === PROXY ? 'Cloudflare의 /api가 응답하지 않습니다. 저장소에 functions/api.js가 올라가 있는지, Cloudflare에서 배포가 끝났는지 확인해 주세요.' : '서버 응답을 읽지 못했습니다. 연결 주소를 확인해 주세요.'); }))
     .then(j => { if (!j || !j.ok) throw mkErr(j); return j; })
     .catch(e => { if (e.name === 'AbortError') throw new Error('응답이 늦습니다. 잠시 뒤 다시 해 주세요.'); if (/Failed to fetch|NetworkError|Load failed/i.test(e.message)) throw new Error('서버에 연결하지 못했습니다. 인터넷 연결을 확인해 주세요.'); throw e; })
     .finally(() => clearTimeout(t));
 }
+/* 서명 페이지(GitHub Pages) 주소. QR·서명 주소는 언제나 이 주소 기준으로 자동으로 만들어진다:
+   구글 주소(…/exec)는 네이버·카톡 앱 안 브라우저에서 흰 화면이 되지만, 이 주소는 어디서 찍어도 바로 열린다. */
+const DEFAULT_PAGE = 'https://bugybugy6058-hub.github.io/sign/';
+function pageBase() {
+  /* 지금 이 화면이 일반 웹 주소(GitHub Pages 등)에 올려져 있으면 그 주소를, 파일·구글 웹 앱으로 열었으면 기본 서명 페이지를 쓴다 */
+  if (!GAS && !framed && location.protocol === 'https:' && !/(^|\.)(google|googleusercontent)\.com$/.test(location.hostname)) return location.origin + location.pathname;
+  return DEFAULT_PAGE;
+}
 function signerLink() {
   if (!PID) return '';
-  if (GAS) return String(BOOT.url || '').replace(/[?#].*$/, '') + '?p=' + PID;
-  /* 웹(GitHub Pages 등)에 올린 파일이면 그 주소로: 네이버·카톡 앱 안 브라우저에서도 열린다. 파일(file://)로 열었을 때만 구글 주소를 쓴다 */
-  if (/^https?:$/.test(location.protocol) && API) { const q = QS.get('s') ? 's=' + encodeURIComponent(QS.get('s')) : 'api=' + encodeURIComponent(API); return location.origin + location.pathname + '?' + q + '&p=' + PID; }
-  return API ? API + '?p=' + PID : '';
+  const api = GAS ? String(BOOT.url || '').replace(/[?#].*$/, '') : API; if (!api) return '';
+  const m = api.match(/^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec$/), page = pageBase();
+  if (!GAS && PROXY && api === PROXY) return page + '?p=' + PID;   /* Cloudflare가 서버로 이어 주므로 주소에 서버를 적지 않는다 → 짧고, 서버 주소가 드러나지 않는다 */
+  if (page) return page + '?' + (m ? 's=' + m[1] : 'api=' + encodeURIComponent(api)) + '&p=' + PID;   /* s= 는 서버 주소를 짧게 적은 것 → QR이 성글어 잘 찍힌다 */
+  return api + '?p=' + PID;
 }
 const qrBox = (id, title, text) => (SERVER && PID && signerLink()) ? `<aside class="qrbox" aria-label="${esc(title)}"><div class="qr sm" data-qr id="${id}"></div><div><b>${esc(title)}</b><p class="hint">${text}</p></div></aside>` : '';
 
@@ -511,6 +600,13 @@ function sigPng(sig, cw, ch) {
 const PW = 794, PH = 1123;
 const layOf = t => t.lay || LAYD, cwOf = t => PW - 2 * layOf(t).padX;
 function geom(t) {
+  if (!t.pdf) return geomStd(t);
+  /* PDF 서식: 줄 수·단 수는 PDF에 맞춘 값을 쓰고, 서명 크기는 서명 칸 크기에 맞춘다 (표 모양 값은 한글용 복사·엑셀에 쓰인다) */
+  const P = t.pdf, g = geomStd(Object.assign({}, t, { blocks: P.blocks, rows: P.per * P.blocks })), sf = P.fields.find(f => f.k === 'sign');
+  g.pdf = true; if (sf) { g.sw = Math.max(10, Math.round(sf.w - 4)); g.sh = Math.max(8, Math.round(sf.h - 3)); }
+  return g;
+}
+function geomStd(t) {
   const L = layOf(t), CW = cwOf(t);
   const blocks = t.blocks, per = Math.ceil(t.rows / blocks), bw = Math.floor(CW / blocks), tot = t.cols.reduce((a, c) => a + c.w, 0);
   let acc = 0; const widths = t.cols.map((c, i) => { const w = i === t.cols.length - 1 ? bw - acc : Math.round(bw * c.w / tot); acc += w; return w; });
@@ -523,7 +619,8 @@ function geom(t) {
 function stats(n) { const total = +digits(S.cfg.total) || (S.cfg.mode === 'roster' ? nRoster() : 0) || 0; return { total, rate: total ? Math.round(n / total * 1000) / 10 : null }; }
 function fill(s, n) { n = n == null ? nSigs() : n; const st = stats(n); return String(s || '').replace(/\{학교\}/g, S.cfg.school || '').replace(/\{전체\}/g, st.total || '').replace(/\{동의\}/g, n || '').replace(/\{율\}/g, st.rate == null || !n ? '' : st.rate).replace(/\{오늘\}/g, todayK()); }
 function pageHTML(sigs, pi, g, opt) {
-  opt = opt || {}; const t = S.cfg.tpl, L = layOf(t), CW = cwOf(t), n = opt.count == null ? sigs.length : opt.count, tk = s => esc(fill(s, n));
+  opt = opt || {}; if (S.cfg.tpl.pdf && !opt.copy) return pdfPageHTML(sigs, pi, g, opt);
+  const t = S.cfg.tpl, L = layOf(t), CW = cwOf(t), n = opt.count == null ? sigs.length : opt.count, tk = s => esc(fill(s, n));
   const F = `font-family:${FONTS[L.font] || FONTS.batang};color:#111;`, B = 'border:1px solid #111;';
   const td = (w, h, extra) => `${B}width:${w}px;height:${h}px;padding:0 3px;text-align:center;vertical-align:middle;font-size:${L.cellSize}px;line-height:1.2;overflow:hidden;white-space:nowrap;${extra || ''}`;
   let h = opt.copy ? `<div style="width:${CW}px;${F}">` : `<div class="page" style="width:${PW}px;height:${PH}px;box-sizing:border-box;padding:${L.padTop}px ${L.padX}px 0;background:#fff;position:relative;overflow:hidden;${F}">`;
@@ -560,8 +657,324 @@ function pageHTML(sigs, pi, g, opt) {
 }
 /* 30명을 넘으면 같은 서식이 다음 쪽으로 이어진다 */
 function pagesAll(opt) { const g = geom(S.cfg.tpl), n = Math.max(1, Math.ceil(S.sigs.length / g.rpp)), out = []; for (let i = 0; i < n; i++) out.push(pageHTML(S.sigs, i, g, opt)); return out; }
-const fitBox = html => `<div class="pagefit"><div class="pg">${html}</div></div>`;
-function fitPages() { $$('.pagefit').forEach(b => { const s = Math.min(1, b.clientWidth / PW), p = b.firstElementChild; p.style.transform = `scale(${s})`; b.style.height = Math.round(PH * s) + 'px'; }); }
+const pdim = () => { const P = S.cfg.tpl.pdf; return P ? { w: P.pw, h: P.ph } : { w: PW, h: PH }; };
+const fitBox = html => { const d = pdim(); return `<div class="pagefit" data-w="${d.w}" data-h="${d.h}" style="max-width:${d.w}px"><div class="pg" style="width:${d.w}px">${html}</div></div>`; };
+function fitPages() { $$('.pagefit').forEach(b => { const w = +b.dataset.w || PW, h = +b.dataset.h || PH, s = Math.min(1, b.clientWidth / w), p = b.firstElementChild; p.style.transform = `scale(${s})`; b.style.height = Math.round(h * s) + 'px'; }); }
+/* 인쇄 쪽 설정: 가로 서식·안내문 인쇄처럼 기본(A4 세로·여백 없음)과 다를 때만 덧씌운다 */
+function setPageCss(css) { let st = $('#pgcss'); if (!st) { st = document.createElement('style'); st.id = 'pgcss'; document.body.appendChild(st); } st.textContent = css ? '@media print{' + css + '}' : ''; }
+
+/* ---------- PDF 서식: 올린 PDF 한 쪽을 바탕에 깔고 그 위에 직·성명·서명을 놓는다 ---------- */
+const PF_TY = { seq: '자동 번호', sel: '고르기', name: '성명', text: '글자', sign: '서명' };
+const pfStName = x => (x.n && x.n.trim()) || (PF_ST.find(a => a[0] === x.t) || [])[1] || x.t || '글자';
+function pfLabel(f) { const c = S.cfg.tpl.cols.find(c => c.k === f.k); return c ? (c.label || PF_TY[c.type]) : f.k; }
+/* 칸에 맞는 글자 크기: 한글은 한 글자 폭, 영문·숫자는 0.58글자 폭으로 어림한다 */
+function fitTxt(v, w, h, base) { let est = 0; for (const ch of String(v)) est += ch.charCodeAt(0) > 0x2E7F ? 1 : 0.58; let fs = Math.min(base, h * 0.72); if (est * fs > w - 4) fs = (w - 4) / est; return Math.max(6, Math.round(fs * 10) / 10); }
+function pdfPageHTML(sigs, pi, g, opt) {
+  const t = S.cfg.tpl, P = t.pdf, L = layOf(t), n = opt.count == null ? sigs.length : opt.count, F = `font-family:${FONTS[L.font] || FONTS.batang};color:#111;`, r1 = v => Math.round(v * 10) / 10;
+  const txt = (f, x, y, v) => v === '' ? '' : `<div style="position:absolute;left:${x}px;top:${y}px;width:${f.w}px;height:${f.h}px;line-height:${f.h}px;text-align:center;overflow:hidden;white-space:nowrap;font-size:${fitTxt(v, f.w, f.h, L.cellSize + 1)}px;${F}">${esc(v)}</div>`;
+  let h = `<div class="page" style="width:${P.pw}px;height:${P.ph}px;box-sizing:border-box;background:#fff;position:relative;overflow:hidden;${F}"><img src="${P.src}" alt="" style="position:absolute;left:0;top:0;width:${P.pw}px;height:${P.ph}px;display:block;max-width:none">`;
+  P.fields.forEach(f => {
+    for (let b = 0; b < P.blocks; b++) for (let i = 0; i < P.per; i++) {
+      const idx = pi * g.rpp + b * P.per + i, sg = sigs[idx] || null, x = r1(f.x + b * P.dx), y = r1(f.y + i * P.dy);
+      if (f.k === 'seq') h += txt(f, x, y, String(idx + 1));
+      else if (!sg) continue;
+      else if (f.k === 'sign') h += `<img src="${sigPng(sg, g.sw, g.sh)}" alt="${esc(sg.f.name || '')} 서명" style="position:absolute;left:${r1(x + (f.w - g.sw) / 2)}px;top:${r1(y + (f.h - g.sh) / 2)}px;width:${g.sw}px;height:${g.sh}px;display:block;max-width:none">`;
+      else h += txt(f, x, y, String(sg.f[f.k] || ''));
+    }
+  });
+  P.st.forEach(x => { if (x.on && x.t) h += txt(x, x.x, x.y, String(fill(x.t, n))); });
+  return h + '</div>';
+}
+/* 서식 설정 탭의 PDF 서식 칸 */
+function pdfEdHTML() {
+  const t = S.cfg.tpl, P = t.pdf, box = 'border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--bg)';
+  const up = label => `<label class="btn${P ? ' sm' : ' pri'}" for="pf_file">${label}<input type="file" id="pf_file" accept="application/pdf,.pdf,image/png,image/jpeg" hidden></label><label class="hint" for="pf_page" style="display:inline-flex;align-items:center;gap:6px">쓸 쪽 <input class="in" id="pf_page" type="number" min="1" max="99" value="1" style="width:70px;min-height:32px;padding:4px 8px"></label>`;
+  if (!P) return `<div class="pfdrop" id="pfdrop" data-drop="여기에 놓으면 PDF 서식으로 들어갑니다" style="${box}"><b>📄 PDF 서식으로 서명받기</b><p class="hint">쓰던 동의서·서명부 <b>PDF</b>(또는 그림 파일)를 올리면, 아래 기본 서식 대신 <b>그 서식 위에</b> 직·성명·서명이 들어갑니다. 올린 뒤 서식에 넣을 칸을 정하고, 서식 그림에서 첫 번째 사람의 칸을 한 번씩 눌러 자리만 알려 주면 됩니다. 올리지 않으면 지금까지와 똑같이 기본 서식을 씁니다.</p><div class="pfzone"><b>PDF 파일을 여기로 끌어다 놓으세요</b><span class="hint">또는 아래 단추로 파일을 고르세요</span><div class="row" style="justify-content:center">${up('PDF 서식 올리기')}</div></div></div>`;
+  const sel = V.pf || (V.pf = {}), fOf = k => P.fields.find(f => f.k === k);
+  if (sel.st != null && !P.st[sel.st]) delete sel.st;
+  if (sel.k === undefined && sel.st == null) { const nx = t.cols.find(c => c.type !== 'seq' && !fOf(c.k)); sel.k = nx ? nx.k : ''; }
+  const selSt = sel.st != null ? P.st[sel.st] : null, selCol = !selSt && sel.k ? t.cols.find(c => c.k === sel.k) : null;
+  const guide = selSt ? `<b>‘${esc(pfStName(selSt))}’</b>이(가) 들어갈 자리를 아래 서식 그림에서 누르세요.` : selCol ? `아래 서식 그림에서 <b>첫 번째 사람</b>의 <b>‘${esc(selCol.label || PF_TY[selCol.type])}’</b> 칸을 누르세요.` : '자리를 잡거나 옮길 칸의 <b>[자리 잡기]</b>를 누른 다음, 아래 서식 그림에서 그 칸을 누르세요.';
+  const state = on => on ? '<span class="pill ok">✓ 자리 잡음</span>' : '<span class="pill">자리 없음</span>';
+  const tail = h => `<span class="row" style="gap:4px;margin-left:auto;flex-wrap:nowrap">${h}</span>`;
+  /* 사람마다 넣는 칸 = 서식의 '표의 칸'. 여기서 이름을 바꾸고, 넣고, 뺀다 */
+  const colRows = t.cols.map((c, i) => { const f = fOf(c.k), on = selCol === c; return `<div class="pfc${on ? ' on' : ''}">
+    <input class="in nm" id="tc_l${i}" maxlength="20" value="${esc(c.label)}" placeholder="칸 이름" aria-label="칸 ${i + 1} 이름"><span class="pill">${PF_TY[c.type]}</span>
+    <button class="btn sm${on ? ' pri' : ''}" data-act="pfSel" data-k="${esc(c.k)}">${f ? '자리 다시 잡기' : '자리 잡기'}</button>${state(!!f)}${c.type === 'seq' && !f ? '<span class="hint">서식에 번호가 이미 찍혀 있으면 그대로 두세요</span>' : ''}
+    ${tail(`${f ? `<button class="btn sm" data-act="pfUnplace" data-k="${esc(c.k)}">자리 빼기</button>` : ''}<button class="btn sm" data-act="colUp" data-i="${i}" aria-label="칸 ${i + 1} 위로"${i ? '' : ' disabled'}>↑</button><button class="btn sm danger" data-act="colDel" data-i="${i}" aria-label="칸 ${i + 1} 빼기"${c.type === 'name' || c.type === 'sign' ? ' disabled' : ''}>칸 빼기</button>`)}
+    ${c.type === 'sel' ? `<label class="hint" for="tp_opts" style="flex-basis:100%;display:flex;flex-direction:column;gap:4px">고르는 항목 (쉼표로 구분 · 비우면 직접 적는 칸이 됩니다)<textarea class="in" id="tp_opts" rows="2" maxlength="600">${esc((c.opts || []).join(', '))}</textarea></label>` : ''}</div>`; }).join('');
+  const nText = t.cols.filter(c => c.type === 'text').length;
+  const colAdd = `${nText < 6 ? `<button class="btn sm" data-act="colAdd" data-type="text">+ 글자 칸 추가</button>` : ''}${t.cols.some(c => c.type === 'sel') ? '' : `<button class="btn sm" data-act="colAdd" data-type="sel">+ 고르는 칸 추가</button>`}${t.cols.some(c => c.type === 'seq') ? '' : `<button class="btn sm" data-act="colAdd" data-type="seq">+ 번호 칸 추가</button>`}`;
+  /* 한 번만 넣는 글자 */
+  const stRows = P.st.map((x, i) => { const on = selSt === x; return `<div class="pfc${on ? ' on' : ''}">
+    <input class="in nm" data-ps="${i}" data-k="n" maxlength="20" value="${esc(x.n)}" placeholder="칸 이름 (예: 학교명)" aria-label="글자 ${i + 1} 이름"><input class="in tx" data-ps="${i}" data-k="t" maxlength="60" value="${esc(x.t)}" placeholder="넣을 글자" aria-label="글자 ${i + 1} 내용">
+    <select class="in au" data-ps="${i}" data-k="auto" aria-label="글자 ${i + 1} 자동 값"><option value="">자동 값…</option>${PF_ST.map(a => `<option value="${a[0]}"${x.t === a[0] ? ' selected' : ''}>${a[1]}</option>`).join('')}</select>
+    <button class="btn sm${on ? ' pri' : ''}" data-act="pfSelSt" data-i="${i}">${x.on ? '자리 다시 잡기' : '자리 잡기'}</button>${state(x.on)}
+    ${tail(`${x.on ? `<button class="btn sm" data-act="pfStOff" data-i="${i}">자리 빼기</button>` : ''}<button class="btn sm danger" data-act="pfStDel" data-i="${i}" aria-label="글자 ${i + 1} 지우기">지우기</button>`)}</div>`; }).join('');
+  const pc = (v, b) => (v / b * 100).toFixed(3) + '%', bx = (x, y, f) => `left:${pc(x, P.pw)};top:${pc(y, P.ph)};width:${pc(f.w, P.pw)};height:${pc(f.h, P.ph)}`;
+  let ov = '';
+  P.fields.forEach(f => { for (let b = 0; b < P.blocks; b++) for (let i = 0; i < P.per; i++) { if (b || i) ov += `<i class="pfr" style="${bx(f.x + b * P.dx, f.y + i * P.dy, f)}"></i>`; } });
+  P.fields.forEach(f => { ov += `<i class="pfb" style="${bx(f.x, f.y, f)}">${esc(pfLabel(f))}</i>`; });
+  P.st.forEach(x => { if (x.on) ov += `<i class="pfb st" style="${bx(x.x, x.y, x)}">${esc(pfStName(x))}</i>`; });
+  const NM = { x: '왼쪽', y: '위', w: '너비', h: '높이' }, coord = (tag, o) => ['x', 'y', 'w', 'h'].map(k => `<label class="hint" style="display:inline-flex;align-items:center;gap:4px">${NM[k]}<input class="in" type="number" step="0.5" value="${o[k]}" data-pc="${tag}" data-k="${k}"></label>`).join('');
+  const fine = P.fields.map((f, i) => `<div class="pfrow"><span class="pill bad">${esc(pfLabel(f))}</span>${coord('f' + i, f)}</div>`).join('') + P.st.map((x, i) => x.on ? `<div class="pfrow"><span class="pill acc">${esc(pfStName(x))}</span>${coord('s' + i, x)}</div>` : '').join('');
+  return `<div class="pfdrop" id="pfdrop" data-drop="여기에 놓으면 PDF 서식이 바뀝니다" style="${box}">
+  <div class="row sp"><b>📄 PDF 서식 사용 중 <span class="muted" style="font-weight:500;font-size:13px">${esc(P.name)} · 한 쪽 ${P.per * P.blocks}명</span></b><div class="row">${up('PDF 바꾸기')}<button class="btn sm danger" data-act="pfOff" data-confirm="한 번 더 누르면 기본 서식으로">기본 서식으로 돌아가기</button></div></div>
+  <p class="hint">① 아래 목록에서 서식에 넣을 칸을 정합니다(이름 바꾸기 · 추가 · 빼기). → ② 그 칸의 <b>[자리 잡기]</b>를 누르고(서식 그림 바로 위 ‘자리 잡을 칸’에서 골라도 됩니다) → ③ 서식 그림에서 그 칸을 누릅니다. 표 선이 있는 칸은 누르기만 하면 칸 크기와 줄 수·단 수를 알아서 찾고, 선이 없는 자리는 마우스로 끌어서 네모를 그립니다. 다른 PDF로 바꾸려면 [PDF 바꾸기]를 누르거나 파일을 이 상자에 끌어다 놓으세요.</p>
+  <div class="pfgrp"><div class="pfhead"><b>사람마다 넣는 칸 <span class="muted" style="font-weight:500;font-size:13px">${t.cols.length}개 · 서명하는 분마다 한 줄씩 채워집니다</span></b><span class="row">${colAdd}</span></div>${colRows}</div>
+  <div class="pfgrp"><div class="pfhead"><b>한 번만 넣는 글자 <span class="muted" style="font-weight:500;font-size:13px">${P.st.length}개 · 서식에 한 번만 찍힙니다</span></b><span class="row">${PF_ST.map(a => `<button class="btn sm" data-act="pfStAdd" data-t="${a[0]}" data-n="${a[1]}">+ ${a[1]}</button>`).join('')}<button class="btn sm" data-act="pfStAdd">+ 직접 추가</button></span></div>${stRows || '<p class="hint">아직 없습니다. 위 단추로 학교명·인원·날짜처럼 서식에 한 번만 들어가는 글자를 넣을 수 있습니다.</p>'}
+  ${P.st.length ? `<p class="hint">칸 이름은 알아보기 쉽게 붙이는 이름이고, 서식에는 <b>넣을 글자</b>가 찍힙니다. 넣을 글자에 <span class="mono">{학교} {전체} {동의} {율} {오늘}</span>을 적거나 [자동 값]에서 고르면 저장된 값으로 채워집니다.</p>` : ''}</div>
+  <div class="note${selSt || selCol ? ' ok' : ''}" id="pf_guide">${guide}</div>
+  <div class="row" id="pf_pick" style="gap:6px"><span class="hint">자리 잡을 칸</span>${t.cols.map(c => `<button class="btn sm${selCol === c ? ' pri' : ''}" data-act="pfSel" data-k="${esc(c.k)}" data-near="1">${fOf(c.k) ? '✓ ' : ''}${esc(c.label || PF_TY[c.type])}</button>`).join('')}${P.st.map((x, i) => `<button class="btn sm${selSt === x ? ' pri' : ''}" data-act="pfSelSt" data-i="${i}" data-near="1">${x.on ? '✓ ' : ''}${esc(pfStName(x))}</button>`).join('')}</div>
+  <div class="pfed" id="pfed" style="max-width:${P.pw}px"><img src="${P.src}" alt="PDF 서식" draggable="false">${ov}<i class="pfdrag" id="pfdrag" hidden></i></div>
+  <p class="hint"><b style="color:#C4372B">빨간 네모</b>가 첫 번째 사람, 점선이 다음 사람들 자리, <b style="color:#1F4E79">파란 네모</b>가 한 번만 넣는 글자입니다.</p>
+  <div class="g4"><label class="f" for="pf_per">한 단의 줄 수<input class="in" id="pf_per" type="number" min="1" max="60" value="${P.per}"></label><label class="f" for="pf_dy">줄 간격 (px)<input class="in" id="pf_dy" type="number" min="0" step="0.1" value="${P.dy}"></label><label class="f" for="pf_blocks">단 수<select class="in" id="pf_blocks">${[1, 2, 3].map(v => `<option${P.blocks === v ? ' selected' : ''}>${v}</option>`).join('')}</select></label><label class="f" for="pf_dx">단 간격 (px)<input class="in" id="pf_dx" type="number" min="0" step="0.1" value="${P.dx}"></label></div>
+  <div class="row"><button class="btn sm" data-act="pfAuto">줄 수·단 수 자동으로 다시 찾기</button><span class="hint">한 쪽 인원 = 줄 수 × 단 수. 넘으면 같은 서식이 다음 쪽으로 이어집니다. 한 사람이 한 장씩 쓰는 서식이면 줄 수 1 · 단 수 1로 두세요.</span></div>
+  ${fine ? `<div style="display:flex;flex-direction:column;gap:6px"><b style="font-size:13px;color:var(--muted)">자리 미세 조정 (단위 px · 한 쪽 ${P.pw}×${P.ph})</b>${fine}</div>` : ''}
+  <p class="hint">PDF 서식을 쓰는 동안 화면·인쇄·PDF 저장·그림 저장은 올린 서식 모양으로 나갑니다. 아래 설정 가운데 <b>서식 제목·학교명·전체 인원·글자체·표 안 글자 크기</b>는 그대로 쓰이고, 나머지(요약 표·문구·여백·줄 수)는 한글용 복사와 엑셀 저장에만 쓰입니다.</p></div>`;
+}
+/* 목록에서 [자리 잡기]를 눌렀는데 서식 그림이 화면 아래에 있으면 그림 쪽으로 내려 준다 */
+function pfShow() { const ed = $('#pfed'), g = $('#pf_guide'); if (!ed || !g) return; const r = ed.getBoundingClientRect(); if (r.top > window.innerHeight * 0.45 || r.bottom < 160) { try { g.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { g.scrollIntoView(); } } }
+function bindPdfEd() {
+  const ed = $('#pfed'), P = S.cfg.tpl.pdf; if (!ed || !P) return; const dg = $('#pfdrag'); let st = null;
+  const pt = e => { const r = ed.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * P.pw, (e.clientY - r.top) / r.height * P.ph]; };
+  ed.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button !== 0) return; st = { p: pt(e), drag: false, free: e.pointerType !== 'touch' }; if (st.free) { e.preventDefault(); try { ed.setPointerCapture(e.pointerId); } catch (x) { } } });
+  ed.addEventListener('pointermove', e => {
+    if (!st || !st.free) return; const p = pt(e); if (!st.drag && Math.abs(p[0] - st.p[0]) + Math.abs(p[1] - st.p[1]) < 8) return; st.drag = true;
+    const x = Math.min(p[0], st.p[0]), y = Math.min(p[1], st.p[1]), w = Math.abs(p[0] - st.p[0]), h = Math.abs(p[1] - st.p[1]);
+    dg.style.cssText = `left:${x / P.pw * 100}%;top:${y / P.ph * 100}%;width:${w / P.pw * 100}%;height:${h / P.ph * 100}%`; dg.hidden = false;
+  });
+  ed.addEventListener('pointerup', e => {
+    if (!st) return; const s0 = st, p = pt(e); st = null;
+    if (s0.drag) pfDrag({ x: Math.min(p[0], s0.p[0]), y: Math.min(p[1], s0.p[1]), w: Math.abs(p[0] - s0.p[0]), h: Math.abs(p[1] - s0.p[1]) });
+    else if (Math.abs(p[0] - s0.p[0]) + Math.abs(p[1] - s0.p[1]) < 14) pfTap(s0.p[0], s0.p[1]);
+  });
+  ed.addEventListener('pointercancel', () => { st = null; if (dg) dg.hidden = true; });
+}
+async function pfTap(x, y) {
+  const sel = V.pf || {}; if (!sel.k && sel.st == null) { toast('먼저 자리를 잡을 칸의 [자리 잡기]를 눌러 주세요.'); return; }
+  let det = null; try { det = await pfDetect(x, y); } catch (e) { }
+  if (det) pfPlace(det, det);
+  else pfPlace({ x: x - 55, y: y - 12, w: 110, h: 24 }, null, '칸 테두리를 찾지 못해 누른 자리에 네모를 놓았습니다. 마우스로 끌어서 다시 그리거나 아래 숫자로 맞춰 주세요.');
+}
+async function pfDrag(r) {
+  let det = null; try { det = await pfDetect(r.x + r.w / 2, r.y + r.h / 2); } catch (e) { }
+  pfPlace(r, det && Math.abs(det.h - r.h) < Math.max(6, r.h * 0.5) ? det : null);
+}
+/* 고른 칸을 r 자리에 놓는다. 사람마다 넣는 칸 가운데 처음 놓는 칸이면 줄 수·단 수도 함께 정한다 */
+function pfPlace(r, det, note) {
+  readTpl(); const t = S.cfg.tpl, P = t.pdf, sel = V.pf || {}; if (!P) return;
+  const one = sel.st != null ? P.st[sel.st] : null;
+  if (!one && !sel.k) { toast('먼저 자리를 잡을 칸의 [자리 잡기]를 눌러 주세요.'); return; }
+  if (r.w < 6 || r.h < 6) { render(); toast('네모가 너무 작습니다. 조금 더 크게 그려 주세요.'); return; }
+  let msg;
+  if (one) { Object.assign(one, { x: r.x, y: r.y, w: r.w, h: r.h, on: true }); msg = note || `‘${pfStName(one)}’ 자리를 잡았습니다.`; }
+  else {
+    const first = !P.fields.length;
+    P.fields = P.fields.filter(f => f.k !== sel.k); P.fields.push({ k: sel.k, x: r.x, y: r.y, w: r.w, h: r.h });
+    msg = note || `‘${pfLabel(sel)}’ 칸 자리를 잡았습니다.`;
+    if (first) {
+      if (det) { P.per = det.per; P.dy = det.dy; P.blocks = det.blocks; P.dx = det.dx; msg += ` 아래로 ${det.per}줄${det.blocks > 1 ? ' · ' + det.blocks + '단' : ''}을 찾았습니다.`; }
+      else { if (!P.dy) P.dy = r.h; msg += ' 줄 수와 줄 간격은 아래에서 넣어 주세요.'; }
+    }
+  }
+  t.pdf = normPdf(P);
+  const nx = t.cols.find(c => c.type !== 'seq' && !t.pdf.fields.some(f => f.k === c.k)); V.pf = { k: nx ? nx.k : '' };
+  render(); toast(msg + (!one && !nx ? ' 사람마다 넣는 칸은 다 잡았습니다. [서식 설정 저장]을 눌러 주세요.' : ''));
+}
+/* 서식 그림에서 표 선 찾기 */
+const PFA = { src: '', W: 0, H: 0, d: null };
+function pfLoad(P) {
+  if (PFA.d && PFA.src === P.src) return Promise.resolve(PFA);
+  return new Promise((res, rej) => {
+    const im = new Image(); im.onerror = () => rej(new Error('서식 그림을 읽지 못했습니다.'));
+    im.onload = () => {
+      const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0);
+      const px = x.getImageData(0, 0, c.width, c.height).data, d = new Uint8Array(c.width * c.height); for (let i = 0, j = 0; i < d.length; i++, j += 4) d[i] = px[j] * 0.299 + px[j + 1] * 0.587 + px[j + 2] * 0.114 < 170 ? 1 : 0;
+      PFA.src = P.src; PFA.W = c.width; PFA.H = c.height; PFA.d = d; res(PFA);
+    };
+    im.src = P.src;
+  });
+}
+/* 선 목록 [[시작, 끝], …]: 가로줄은 x 구간 a0~a1, 세로줄은 y 구간 a0~a1 의 90% 이상이 어두운 줄 */
+function pfLines(A, horiz, a0, a1) {
+  const out = [], N = horiz ? A.H : A.W, min = Math.max(3, (a1 - a0 + 1) * 0.9); let run = -1;
+  for (let v = 0; v < N; v++) {
+    let c = 0; if (horiz) { const o = v * A.W; for (let x = a0; x <= a1; x++) c += A.d[o + x]; } else for (let y = a0; y <= a1; y++) c += A.d[y * A.W + v];
+    if (c >= min) { if (run < 0) run = v; } else if (run >= 0) { out.push([run, v - 1]); run = -1; }
+  }
+  if (run >= 0) out.push([run, N - 1]); return out;
+}
+/* 누른 자리(쪽 좌표)의 표 칸과, 아래로 이어지는 줄 수·옆으로 되풀이되는 단 수. 못 찾으면 null */
+async function pfDetect(px, py) {
+  const P = S.cfg.tpl.pdf, A = await pfLoad(P), k = A.W / P.pw, ix = Math.round(px * k), iy = Math.round(py * k);
+  if (ix < 3 || iy < 3 || ix > A.W - 4 || iy > A.H - 4) return null;
+  const around = (L, v) => { let a = null; for (const ln of L) { if (ln[1] < v) a = ln; else if (ln[0] > v) return a ? [a, ln] : null; else return null; } return null; };
+  const band = Math.max(6, Math.round(A.W * 0.012));
+  let hl = pfLines(A, true, Math.max(0, ix - band), Math.min(A.W - 1, ix + band)), tb = around(hl, iy); if (!tb || tb[1][0] - tb[0][1] < 7) return null;
+  const vl = pfLines(A, false, tb[0][1] + 2, tb[1][0] - 2), lr = around(vl, ix); if (!lr || lr[1][0] - lr[0][1] < 7) return null;
+  const hl2 = pfLines(A, true, lr[0][1] + 2, lr[1][0] - 2), tb2 = around(hl2, iy); if (tb2 && tb2[1][0] - tb2[0][1] >= 7) { hl = hl2; tb = tb2; }
+  const x0 = lr[0][1] + 1, x1 = lr[1][0] - 1, y0 = tb[0][1] + 1, y1 = tb[1][0] - 1, hc = y1 - y0 + 1;
+  if ((x1 - x0) / k > P.pw * 0.98 || hc / k > P.ph * 0.9) return null;
+  let rows = 1, lastTop = y0, prev = hl.indexOf(tb[1]);
+  for (let j = prev + 1; j < hl.length && rows < 60; j++) { const h2 = hl[j][0] - hl[prev][1] - 1; if (Math.abs(h2 - hc) > Math.max(3, hc * 0.22)) break; lastTop = hl[prev][1] + 1; rows++; prev = j; }
+  const dy = rows > 1 ? (lastTop - y0) / (rows - 1) : hc + (tb[1][1] - tb[1][0] + 1);
+  const cells = []; for (let j = 0; j + 1 < vl.length; j++) { const a = vl[j][1] + 1, b = vl[j + 1][0] - 1; if (b - a >= 6) cells.push([a, b]); }
+  const ci = cells.findIndex(c => ix >= c[0] && ix <= c[1]); let blocks = 1, dx = 0;
+  for (const nb of [2, 3]) {
+    const per = cells.length / nb; if (cells.length % nb || per < 2 || ci < 0 || ci >= per) continue; let same = true;
+    for (let j = 0; j + per < cells.length && same; j++) { const w1 = cells[j][1] - cells[j][0], w2 = cells[j + per][1] - cells[j + per][0]; if (Math.abs(w1 - w2) > Math.max(3, w1 * 0.08)) same = false; }
+    if (same) { blocks = nb; dx = (cells[per][0] - cells[0][0]) / k; break; }
+  }
+  return { x: x0 / k, y: y0 / k, w: (x1 - x0 + 1) / k, h: hc / k, per: rows, dy: dy / k, blocks, dx };
+}
+/* PDF(또는 그림)의 한 쪽을 서식 바탕 그림으로: 다른 첨부 그림과 같은 크기 한도(약 220KB) 안에서 가장 또렷하게 */
+async function formPage(file, pageNo) {
+  let draw, w0, h0, pages = 1, page = 1, start = 1400;
+  if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+    const PJ = await need('pdfjs'); PJ.GlobalWorkerOptions.workerSrc = CDN + 'pdf.js/3.11.174/pdf.worker.min.js';
+    const doc = await PJ.getDocument({ data: await file.arrayBuffer() }).promise; pages = doc.numPages; page = Math.max(1, Math.min(pages, Math.round(pageNo) || 1));
+    const pg = await doc.getPage(page), v1 = pg.getViewport({ scale: 1 }); w0 = v1.width; h0 = v1.height;
+    draw = async width => { const vp = pg.getViewport({ scale: width / w0 }), c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height); const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); await pg.render({ canvasContext: x, viewport: vp }).promise; return c; };
+  } else if (/^image\/(png|jpeg)$/.test(file.type)) {
+    const im = await new Promise((res, rej) => { const fr = new FileReader(); fr.onerror = () => rej(new Error('파일을 읽지 못했습니다.')); fr.onload = () => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('그림을 읽지 못했습니다.')); i.src = fr.result; }; fr.readAsDataURL(file); });
+    w0 = im.naturalWidth; h0 = im.naturalHeight; start = Math.min(1400, w0);
+    draw = async width => { const c = document.createElement('canvas'); c.width = Math.round(width); c.height = Math.round(width * h0 / w0); const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); return c; };
+  } else throw new Error('PDF나 그림(PNG·JPG) 파일을 올려 주세요.');
+  const land = w0 > h0 * 1.05, k = Math.min((land ? 1123 : 794) / w0, (land ? 794 : 1123) / h0); let src = '', width = start;
+  for (let q = 0; q < 9; q++) {
+    const c = await draw(width); src = c.toDataURL('image/webp', 0.82); if (!/^data:image\/webp/.test(src)) src = c.toDataURL('image/jpeg', 0.82);
+    if (src.length < 225000) break; width = Math.round(width * 0.88);
+  }
+  if (src.length >= 225000) throw new Error('쪽이 너무 복잡해 서식으로 넣지 못했습니다. 사진·그림이 적은 PDF를 써 주세요.');
+  return { src, pw: Math.round(w0 * k), ph: Math.round(h0 * k), pages, page };
+}
+async function pfUpload(file, pno) {
+  readTpl(); const t = S.cfg.tpl, old = t.pdf;
+  if (!old && S.cfg.notice.media.length >= 6) { toast('안내문 첨부가 6개라 PDF 서식을 넣을 자리가 없습니다. [안내문]에서 첨부를 하나 빼고 다시 올려 주세요.'); return; }
+  busy('서식을 읽는 중…');
+  try {
+    const r = await formPage(file, pno), same = !!old && old.pw === r.pw && old.ph === r.ph;
+    t.pdf = normPdf({ src: r.src, name: file.name, pw: r.pw, ph: r.ph, per: same ? old.per : 1, blocks: same ? old.blocks : 1, dy: same ? old.dy : 0, dx: same ? old.dx : 0, fields: same ? old.fields : [], st: old ? old.st.map(x => same ? x : Object.assign({}, x, { on: false })) : [] });
+    V.pf = null; busy(); render();
+    toast(`${r.pages > 1 ? `${r.pages}쪽 가운데 ${r.page}쪽을 ` : ''}서식으로 넣었습니다. ${same && old.fields.length ? '칸 자리는 그대로 두었습니다.' : '첫 번째 사람의 칸을 차례로 눌러 주세요.'} 끝나면 [서식 설정 저장]을 눌러야 반영됩니다.`);
+  } catch (e) { busy(); toast(e.message || '서식을 읽지 못했습니다.'); }
+}
+
+/* ---------- 안내문 인쇄: 서명 첫 화면(안내문)에 QR코드를 찍어 그대로 종이로 ---------- */
+function noticeSheetHTML(cfg, title, link, qrSvg) {
+  const n = cfg.notice, mk = cfg.maker || MAKER_DEF, pid = (link.match(/[?&]p=([0-9A-Za-z]+)/) || [])[1] || '';
+  const U = "font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;", D = "font-family:'Gowun Batang','Nanum Myeongjo','Batang','바탕',serif;";
+  const media = (n.media || []).map(m => m.t === 'img'
+    ? `<figure style="margin:12px 0 0;text-align:${m.align};break-inside:avoid;page-break-inside:avoid"><img src="${m.src}" alt="" style="width:${m.w}%;max-width:100%;height:auto;border:1px solid #C9D1D9;border-radius:6px">${m.cap ? `<figcaption style="font-size:12px;color:#555;margin-top:3px">${esc(m.cap)}</figcaption>` : ''}</figure>`
+    : `<p style="margin:10px 0 0;font-size:13px;color:#333">📎 <b>${esc(m.name)}</b>${m.cap ? ' · ' + esc(m.cap) : ''} <span style="color:#666">— QR을 찍은 휴대폰 화면에서 내려받을 수 있습니다</span></p>`).join('');
+  const step = (tx, i) => `<div style="flex:1;text-align:center;font-size:11.5px;font-weight:600;color:${i ? '#5B6875' : '#1F4E79'}"><div style="height:4px;border-radius:2px;background:${i ? '#D2D9E0' : '#1F4E79'};margin-bottom:4px"></div>${tx}</div>`;
+  return `<div class="pnotice" style="${U}color:#18212B;font-size:14px;line-height:1.6;background:#fff">
+  <div style="display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #18212B">
+    <svg viewBox="0 0 34 34" width="30" height="30" aria-hidden="true"><rect x="3" y="12" width="7" height="19" rx="2" fill="#2A9D8F"/><rect x="13.5" y="3" width="7" height="28" rx="2" fill="#F2862E"/><rect x="24" y="8" width="7" height="23" rx="2" fill="#2B4C7E"/></svg>
+    <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#5B6875">${APP_NAME}</div><div style="font-size:20px;font-weight:800;line-height:1.3">${esc(title)}</div></div>
+    <div style="font-size:11.5px;line-height:1.5;color:#5B6875;text-align:right;white-space:nowrap">제작자: ${esc(mk.name)}<br>소속: ${esc(mk.org)}</div>
+  </div>
+  <div style="display:flex;gap:4px;margin-top:12px">${['안내 읽기', '본인 확인', '서명', '서식 확인'].map(step).join('')}</div>
+  ${n.guide ? `<p style="margin:10px 0 0;font-size:12.5px;color:#5B6875">${esc(n.guide)}</p>` : ''}
+  <div style="margin-top:12px;border:1px solid #B3BEC9;border-radius:12px;padding:16px 18px;background:#F4F6F8">
+    <div style="float:right;width:176px;margin:0 0 10px 16px;padding:8px 8px 10px;text-align:center;background:#fff;border:1.5px solid #18212B;border-radius:10px">
+      <div class="pnqr" style="width:158px;height:158px;margin:0 auto">${qrSvg}</div>
+      <div style="font-size:13.5px;font-weight:700;line-height:1.35;margin-top:4px">📱 휴대폰으로 서명하기</div>
+      <div style="font-size:11px;line-height:1.4;color:#5B6875">카메라로 QR을 찍으세요</div>
+    </div>
+    ${n.title ? `<h2 style="${D}font-size:20px;font-weight:700;line-height:1.35;margin:0 0 10px">${esc(n.title)}</h2>` : ''}
+    <div style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.75">${esc(n.body)}</div>
+    <div style="clear:both"></div>${media}
+  </div>
+  <div style="margin-top:12px;font-size:13px;color:#5B6875">서명이 들어갈 서식 <b style="${D}color:#18212B">「${esc(title)}」</b>${cfg.deadline ? ` · <b style="color:#18212B">서명 기한: ${esc(dlText(cfg.deadline))}까지</b>` : ''}</div>
+  <div style="break-inside:avoid;page-break-inside:avoid">
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:15px;font-weight:500"><span style="flex:none;width:20px;height:20px;border:1.5px solid #5B6875;border-radius:4px;margin-top:2px;background:#fff"></span><span>${esc(n.agree)}</span></div>
+    <div style="margin-top:12px;height:50px;border-radius:12px;background:#1F4E79;color:#fff;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center">동의하고 서명하기</div>
+    <p style="margin:10px 0 0;font-size:12.5px;color:#5B6875">이 종이의 QR코드를 휴대폰 카메라(네이버·카카오톡 앱 포함)로 찍으면 위 화면이 휴대폰에 그대로 열립니다. 안내문을 읽고 동의 칸에 체크한 뒤 <b>[동의하고 서명하기]</b>를 눌러 손가락으로 서명하세요.</p>
+    <p style="margin:6px 0 0;font:500 10.5px/1.4 'IBM Plex Mono',Consolas,monospace;color:#777;overflow-wrap:anywhere">${esc(link)}${pid ? ' · 서명철 ID ' + esc(pid) : ''}</p>
+  </div></div>`;
+}
+async function printNotice(cfg, title, link) {
+  if (!link) throw new Error('서명 주소가 없어 안내문을 만들 수 없습니다.');
+  const q = await need('qr'), qr = q(0, 'M'); qr.addData(link); qr.make();
+  $('#printRoot').innerHTML = noticeSheetHTML(cfg, title, link, qr.createSvgTag({ cellSize: 4, margin: 8, scalable: true }));
+  setPageCss('@page{size:A4;margin:13mm 14mm}');
+  setTimeout(() => window.print(), 150);
+}
+
+/* ---------- 백업 불러오기 · 서명철 옮기기 (구글 시트 서버) ---------- */
+/* 백업 한 권(설정·명단·서명)을 지금 PID·TOKEN이 가리키는 서버 서명철에 넣는다. have 에 있는 서명(같은 ID)은 건너뛴다.
+   서명은 서버의 '서명 넣기'로 한 명씩 다시 넣으므로, 넣는 동안만 마감·기한을 풀어 두었다가 끝나면 백업의 설정으로 되돌린다. */
+async function pushBook(bk, have, onStep) {
+  const cfg = normCfg(bk.cfg); cfg.pwHash = ''; const title = String(bk.title || cfg.tpl.title || BOOK.title || '').slice(0, 80);
+  const open = clone(cfg); open.closed = false; open.deadline = ''; open.allowOutside = true;
+  await call('adminSaveCfg', { cfg: open, title });
+  const src = (Array.isArray(bk.roster) ? bk.roster : []).filter(r => r && String(r.name || '').trim()), ridMap = {}, l4 = {};
+  if (src.length) {
+    const j = await call('adminSaveRoster', { roster: src.map(r => ({ rid: r.id || r.rid || uid('r'), name: String(r.name).trim(), position: String(r.position || '').trim(), mid: digits(r.mid).slice(-4), last4: digits(r.last4).slice(-4), note: r.note || '' })) }), got = (j.roster || []).slice();
+    src.forEach(r => {
+      const old = r.id || r.rid; let i = got.findIndex(g => g && g.rid === old);
+      if (i < 0) i = got.findIndex(g => g && g.name === String(r.name).trim() && String(g.last4 || '') === digits(r.last4).slice(-4));
+      if (i < 0 || !old) return; ridMap[old] = got[i].rid; l4[got[i].rid] = String(got[i].last4 || ''); got[i] = null;
+    });
+  }
+  const sigs = (Array.isArray(bk.sigs) ? bk.sigs : []).filter(sg => sg && sg.id && sg.f && Array.isArray(sg.strokes) && sg.strokes.length).sort((a, b) => a.at < b.at ? -1 : a.at > b.at ? 1 : 0);
+  const todo = sigs.filter(sg => !(have && have[sg.id])), out = { ok: 0, skip: sigs.length - todo.length, fail: 0, err: '' };
+  for (let i = 0; i < todo.length; i++) {
+    const sg = todo[i], rid = sg.rid && ridMap[sg.rid] ? ridMap[sg.rid] : ''; if (onStep) onStep(i + 1, todo.length);
+    try { await call('sign', { f: sg.f, strokes: sg.strokes, rid, last4: rid ? l4[rid] : '', outside: cfg.mode === 'roster' && !rid, at: sg.at }); out.ok++; }
+    catch (e) { out.fail++; out.err = e.message; if (e.code === 'auth') break; }
+  }
+  await call('adminSaveCfg', { cfg, title });
+  return out;
+}
+/* 지금 열려 있는 서버 서명철에 백업을 불러오기 전에 한 번 묻는다 */
+function askRestore(o) {
+  const bk = o && o.app === 'dsign' ? o : (o && o.app === 'dsign-all' && Array.isArray(o.books) && o.books.length === 1 ? o.books[0] : null);
+  if (!bk) { toast(o && o.app === 'dsign-all' ? '서명철이 여러 개 든 백업입니다. [서명철 관리] 탭의 ‘백업 파일로 서명철 가져오기’에서 불러와 주세요.' : '이 프로그램의 백업 파일이 아닙니다.'); return; }
+  const have = {}; S.sigs.forEach(sg => { have[sg.id] = 1; });
+  const all = (Array.isArray(bk.sigs) ? bk.sigs : []).filter(sg => sg && sg.id && Array.isArray(sg.strokes)), add = all.filter(sg => !have[sg.id]).length;
+  V.pend = bk;
+  openModal(`<h3>백업 불러오기</h3><p>백업 파일: <b>${esc(bk.title || '제목 없는 동의서')}</b>${bk.at ? ' · ' + esc(String(bk.at).slice(0, 10)) + ' 저장' : ''} · 서명 ${all.length}명 · 명단 ${Array.isArray(bk.roster) ? bk.roster.length : 0}명</p>
+    <div class="note warn">지금 열려 있는 서명철 <b>‘${esc(BOOK.title || '')}’</b>의 안내문·서식 설정·명단이 백업 내용으로 <b>바뀝니다.</b> 받은 서명은 지워지지 않고, 백업에만 있는 서명 <b>${add}명</b>이 더해집니다.${add ? ' 새로 들어가는 서명의 ‘서명한 때’는 지금 시각으로 적힙니다.' : ''}</div>
+    <div class="row end"><button class="btn" data-close>취소</button><button class="btn pri" data-act="restoreGo">불러오기</button></div>`);
+}
+async function restoreServer(bk) {
+  busy('백업을 불러오는 중…');
+  try {
+    const have = {}; S.sigs.forEach(sg => { have[sg.id] = 1; });
+    const r = await pushBook(bk, have, (i, n) => busy(`서명을 넣는 중… ${i} / ${n}`));
+    await adminLoad(); busy(); V.rdraft = null; render();
+    toast(`백업을 불러왔습니다. 서명 ${r.ok}명을 더했습니다${r.skip ? ` (이미 있는 ${r.skip}명은 그대로)` : ''}.${r.fail ? ` ${r.fail}명은 넣지 못했습니다: ${r.err}` : ''}`);
+  } catch (e) { busy(); toast(e.message); if (!authLost(e)) { try { await adminLoad(); } catch (x) { } render(); } }
+}
+/* 이 기기(브라우저)에만 있는 서명철 가운데 아직 서버로 옮기지 않은 것 */
+const migSet = () => { try { return JSON.parse(LS.get('dsign-mig') || '{}') || {}; } catch (e) { return {}; } };
+const localOnly = () => { if (GAS) return []; const m = migSet(); return localBooks().filter(b => !m[b.id]); };
+/* 백업 여러 권을 서버에 새 서명철로 만든다 (제작자 키 필요) */
+async function importToServer(books) {
+  const mk = masterKey(); if (!mk) { toast('제작자 키가 필요합니다. 처음 화면의 🔑 관리자에서 제작자 키를 넣어 주세요.'); return; }
+  const keepPid = PID, keepTok = TOKEN, mig = migSet(); let made = 0, ok = 0, fail = 0, err = '';
+  for (let i = 0; i < books.length; i++) {
+    const bk = books[i], cfg = normCfg(bk.cfg); cfg.pwHash = ''; const title = String(bk.title || cfg.tpl.title || '가져온 서명철').slice(0, 60);
+    busy(`서명철을 만드는 중… (${i + 1} / ${books.length}) ${title}`);
+    try {
+      PID = ''; const j = await call('create', { title, pw: mk, code: mk, master: mk, cfg }); PID = j.pid; TOKEN = j.token;
+      const r = await pushBook({ title, cfg, roster: bk.roster, sigs: bk.sigs }, null, (a, n) => busy(`‘${title}’ 서명을 넣는 중… ${a} / ${n}`));
+      made++; ok += r.ok; fail += r.fail; if (r.err) err = r.err;
+      if (bk.lid && !r.fail) { mig[bk.lid] = 1; LS.set('dsign-mig', JSON.stringify(mig)); }
+    } catch (e) { err = e.message; }
+  }
+  PID = keepPid; TOKEN = keepTok; busy(); V.books = undefined; render();
+  toast(made ? `서명철 ${made}개를 구글 시트에 넣었습니다 (서명 ${ok}명).${fail ? ` 서명 ${fail}명은 넣지 못했습니다: ${err}` : ''}${made < books.length ? ` ${books.length - made}개는 만들지 못했습니다: ${err}` : ''}` : `서명철을 만들지 못했습니다: ${err || '알 수 없는 오류'}`);
+}
+function bakeBox() {
+  if (!SERVER || GAS) return '';
+  if (PROXY && API === PROXY) return `<section class="sheet"><h3>모든 기기 자동 연결 (Cloudflare)</h3><div class="note ok"><b>이 주소는 Cloudflare가 구글 시트 서버로 이어 주고 있습니다.</b> 휴대폰·아이패드·다른 PC에서 <span class="mono">${esc(pageBase())}</span> 만 열어도 같은 구글 시트에 연결되어, 서명철과 서명이 그대로 보입니다. 구글 시트 서버 주소는 Cloudflare 설정(GAS_URL)에만 있고 이 화면·주소창·QR에는 드러나지 않습니다.</div></section>`;
+  if (API === DEFAULT_API) return `<section class="sheet"><h3>모든 기기 자동 연결</h3><div class="note ok"><b>이 파일에는 구글 시트 서버 주소가 들어 있습니다.</b> 휴대폰·아이패드·다른 PC에서 <span class="mono">${esc(pageBase())}</span> 만 열어도 같은 구글 시트에 연결되어, 서명철과 서명이 그대로 보입니다.</div></section>`;
+  return `<section class="sheet"><h3>모든 기기에서 자동으로 연결하기</h3><p class="hint">지금은 <b>이 기기의 브라우저만</b> 서버 주소를 기억합니다. 그래서 다른 휴대폰·아이패드에서 주소만 열면 서명철이 보이지 않습니다(QR로 열면 보입니다). 아래 단추로 <b>서버 주소가 들어간 프로그램 파일</b>을 받아 GitHub 저장소에 같은 이름으로 올려 두면, 어느 기기에서 열어도 이 구글 시트에 바로 연결됩니다.</p><div class="row"><button class="btn pri" data-act="bakeApi">서버 주소가 들어간 프로그램 파일 받기</button></div></section>`;
+}
 window.addEventListener('resize', () => { fitPages(); });
 
 /* ===== 동의서 서명받기 · 화면 프로그램 (2/3: 서명자 화면·관리자 화면) ===== */
@@ -574,7 +987,7 @@ function head() {
   const right = V.view === 'admin'
     ? `<span class="pill ${SERVER ? 'ok' : CLOUD_ON() ? 'ok' : 'warn'}">${SERVER ? '구글 시트에 저장' : CLOUD_ON() ? 'Claude 클라우드에 저장' : '이 기기에 저장'}</span>${SERVER ? `<button class="btn sm" data-act="books">📚 다른 서명철 열기</button>` : ''}<button class="btn sm" data-act="toSign">서명 화면으로 (잠그기)</button>`
     : V.view === 'load' ? ''
-    : V.view === 'landing' ? (GAS ? '' : `<button class="btn sm ghost" data-act="home">← 처음 화면으로</button>`)
+    : V.view === 'landing' ? `<button class="btn sm pri" data-act="admin">🔑 관리자</button>`
     : V.view === 'llanding' ? `<button class="btn sm pri" data-act="admin">🔑 관리자</button>`
     : `${SERVER ? `<button class="btn sm" data-act="books">📚 서명철 목록</button>` : `<button class="btn sm" data-act="lbooks">📚 서명철 목록</button>`}<button class="btn sm pri" data-act="admin">🔑 관리자</button>`;
   const adminExtra = V.view === 'admin' && !SERVER ? `<button class="btn sm" data-act="lbooks">📚 다른 서명철 열기</button>` : '';
@@ -597,6 +1010,56 @@ function vIntro() {
   </section></main>`;
 }
 
+const masterKey = () => { try { return LS.get('dsign-master') || ''; } catch (e) { return ''; } };
+function syncUrl() {
+  if (GAS || !/^https?:$/.test(location.protocol)) return;
+  try { const u = new URL(location.href); if (!PID) u.searchParams.delete('p');
+    /* 기본 서버면 주소창에 서버 주소를 붙이지 않고, 다른 서버면 짧은 s= 로 붙인다 */
+    if (API && API !== DEFAULT_API && API !== PROXY && !u.searchParams.get('s') && !u.searchParams.get('api')) { const m = API.match(/^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec$/); if (m) u.searchParams.set('s', m[1]); else u.searchParams.set('api', API); }
+    history.replaceState(null, '', u.pathname + u.search); } catch (e) { }
+}
+async function loadBooks() {
+  V.books = null; V.booksErr = '';
+  try { const j = await call('list'); V.books = (j.books || []).sort((a, b) => String(b.created).localeCompare(String(a.created))); }
+  catch (e) { V.books = []; V.booksErr = /알 수 없는 요청/.test(e.message) ? '서버 코드가 예전 버전입니다. Code.gs v1.1.3을 붙여 넣고 배포 관리 → ✏ → 새 버전으로 배포해 주세요.' : e.message; }
+  /* 목록이 늦게 도착해 화면을 다시 그릴 때, 그 사이 적던 서명철 이름이 지워지지 않게 한다 */
+  const typed = $('#nb_title') ? $('#nb_title').value : '', had = document.activeElement && document.activeElement.id === 'nb_title';
+  render();
+  if (typed) { const el = $('#nb_title'); if (el && !el.value) { el.value = typed; if (had) el.focus(); } }
+}
+async function verifyMaster(k) { await call('books', { master: k }); return true; }
+const helpBox = () => `<details class="sheet" style="display:block"><summary style="cursor:pointer;font-weight:600">❓ 제작자 키 · 서명철 ID · QR코드가 뭔가요?</summary><div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.6">
+  <div><b>제작자 키</b> — 동의서 구글 시트 → 확장 프로그램 → Apps Script → <span class="mono">Code.gs</span> 맨 위 <span class="mono">INITIAL_MASTER_KEY = '…'</span> 따옴표 안에 <b>선생님이 적은 글자</b>입니다. 기본값(change-me-1234)은 쓸 수 없으니 6자 이상으로 바꾸고, 바꾼 뒤에는 꼭 <b>배포 → 배포 관리 → ✏ → 버전: 새 버전 → 배포</b>를 해야 반영됩니다. 오른쪽 위 <b>🔑 관리자</b>를 누를 때 이 키를 넣습니다. 서명만 하는 분에게는 필요 없습니다. (setup 함수는 실행하지 않아도 됩니다)</div>
+  <div><b>서명철 ID</b> — 서명철을 만들면 자동으로 붙는 8글자입니다. 외울 필요 없습니다. 목록에서 고르면 되고, <b>다른 선생님이 만든</b> 서명철을 열 때만 그분이 알려 준 ID를 넣습니다.</div>
+  <div><b>QR코드</b> — 목록의 <b>[📱 QR코드]</b>를 누르면 그 서명철의 휴대폰 서명 QR과 주소가 나오고, 그림 저장·인쇄를 할 수 있습니다. QR 주소는 휴대폰에서 바로 열리는 주소로 자동으로 만들어지고, QR을 찍은 분은 목록 없이 그 서명철로 바로 들어갑니다. "이 기기에 저장" 모드의 서명철은 휴대폰에서 열 수 없으므로, 구글 시트 서버에 연결한 뒤 만든 서명철에서만 QR이 나옵니다.</div></div></details>`;
+function keyHelp(msg) { return /제작자 키|관리자 암호/.test(msg || '') ? '제작자 키가 서버의 INITIAL_MASTER_KEY와 다릅니다. Code.gs에 적은 값과 같은지(띄어쓰기·대소문자), 바꾼 뒤 새 버전으로 배포했는지 확인해 주세요.' : msg; }
+function openLocalQrModal() {
+  let api = ''; try { api = localStorage.getItem('dsign-api') || DEFAULT_API || ''; } catch (e) { api = DEFAULT_API || ''; }
+  openModal(`<h3>📱 휴대폰 QR 서명을 받으려면</h3><p>이 서명철은 <b>이 컴퓨터 안</b>에만 저장되어 있어 휴대폰에서 열 수 없습니다. 구글 시트 서버에 연결하면 서명철을 만들고 QR코드를 받을 수 있습니다. (연결한 뒤 🔑 관리자 → 서명철 관리의 [구글 시트로 옮기기]로 이 서명철을 서버에 올릴 수 있습니다)</p>
+    ${IN_ART ? '<p class="hint">claude.ai 화면에서는 서버 연결이 되지 않습니다. GitHub 주소(…/sign/)로 열어 주세요.</p><div class="row end"><button class="btn" data-close>닫기</button></div>'
+    : `<label class="f" for="lk_api4">구글 시트 서버 주소 (Apps Script › 배포 › 배포 관리 › 웹 앱 URL · …/exec)<input class="in" id="lk_api4" value="${esc(api)}" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <p class="hint">연결되면 첫 화면에 제작자 키를 한 번 넣고(기억하기), 관리자 → 서명철 관리에서 서명철을 만든 뒤 목록의 [📱 QR코드]를 누르면 됩니다.</p>
+    <div class="row end"><button class="btn" data-close>닫기</button><button class="btn pri" data-act="goServer4">이 서버로 연결해서 열기</button></div>`}`);
+}
+function signerLinkOf(pid) { const keep = PID; PID = pid; const l = signerLink(); PID = keep; return l; }
+function openQrModal(pid, title) {
+  const link = signerLinkOf(pid); if (!link) { toast('서버 주소가 없어 QR을 만들 수 없습니다.'); return; }
+  const m = openModal(`<h3>📱 ${esc(title)} · 휴대폰 서명 QR</h3>
+    <div class="row" style="align-items:flex-start;gap:18px"><div class="qr" id="qr-modal" style="width:270px;height:270px"></div>
+    <div class="grow" style="display:flex;flex-direction:column;gap:10px;min-width:220px"><div><b>서명 주소</b><div class="linkbox" style="margin-top:4px">${esc(link)}</div></div>
+    <div class="row"><button class="btn pri" data-act="qrModalPng">QR 그림 저장 (PNG)</button><button class="btn" data-act="qrModalPrint">QR 안내문 인쇄</button><button class="btn" data-act="qrModalCopy">주소 복사</button></div>
+    <p class="hint">휴대폰 카메라(네이버·카톡 앱 포함)로 찍으면 바로 안내문 → 서명 화면이 열리고, 서명은 이 서명철에 모입니다. 주소는 자동으로 만들어진 것이라 고칠 필요가 없습니다.</p></div></div>
+    <div class="row end"><button class="btn" data-close>닫기</button></div>`, true);
+  m.dataset.link = link; m.dataset.title = title; m.dataset.pid = pid;
+  need('qr').then(q => { const el = $('#qr-modal', m); if (!el) return; const qr = q(0, 'M'); qr.addData(link); qr.make(); el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 16, scalable: true }); }).catch(() => { });
+}
+async function openBookAdmin(pid) {
+  PID = pid; V.view = 'load'; render();
+  try { const j = await call('boot'); BOOK = { title: j.title, until: '' }; S = { cfg: normCfg(j.cfg), roster: [], sigs: [], count: j.count || 0, rosterN: j.rosterN || 0 }; resetSigner();
+    const l = await call('adminLogin', { pw: masterKey() }); TOKEN = l.token; await adminLoad(); ADMIN = true; V.view = 'admin'; V.tab = 'status'; V.rdraft = null; V.err = ''; syncUrl(); }
+  catch (e) { toast(e.message); PID = ''; V.view = 'landing'; }
+  render(); window.scrollTo(0, 0);
+}
 const dlPassed = () => !!S.cfg.deadline && LIC.endMs(S.cfg.deadline) < Date.now();
 const isClosed = () => !!S.cfg.closed || dlPassed();
 const dlText = d => d ? d.replace(/-/g, '.').replace(' ', ' ') + (d.length > 10 ? '' : ' 자정') : '';
@@ -689,16 +1152,36 @@ function vDone() {
 
 /* ---------- 구글 시트 서버: 서명철 열기·만들기 ---------- */
 function vLanding() {
+  if (V.books === undefined) { V.books = null; setTimeout(loadBooks, 0); }
+  const L = V.books;
+  const list = L === null ? '<p class="hint">서명철 목록을 불러오는 중…</p>'
+    : V.booksErr ? `<div class="note bad"><b>${esc(V.booksErr)}</b></div><div class="row"><button class="btn sm" data-act="mkRefresh">다시 시도</button></div>`
+    : L.length ? `<div class="blist">${L.map(b => `<div class="bitem"><div><b>${esc(b.title)}</b>${b.closed ? ' <span class="pill bad">마감</span>' : ''}<div class="hint">만든 날 ${esc(String(b.created || '').slice(0, 10))} · 서명 ${b.count || 0}명${b.deadline ? ' · 기한 ' + esc(b.deadline) : ''}</div></div><div class="row"><button class="btn pri sm" data-act="bkSign" data-pid="${esc(b.pid)}">열기</button><button class="btn sm" data-act="bkQr" data-pid="${esc(b.pid)}" data-title="${esc(b.title)}">📱 QR코드</button></div></div>`).join('')}</div>`
+    : `<p class="muted">아직 서명철이 없습니다. 오른쪽 위 🔑 관리자 → 서명철 관리에서 만들어 주세요.</p>`;
   return `<main class="wrap narrow">${V.err ? `<div class="note bad"><b>${esc(V.err)}</b></div>` : ''}
-  <section class="sheet"><h2>서명철 열기</h2><p class="hint">받은 주소나 서명철 ID(8글자)를 넣어 주세요.</p>
-    <label class="f" for="op_pid">서명철 ID 또는 주소<input class="in" id="op_pid" autocomplete="off" placeholder="예: K7M2Q9XA"></label><button class="btn pri" data-act="openBook">열기</button></section>
-  <section class="sheet"><h2>새 서명철 만들기</h2><p class="hint">서명철 하나가 동의서 한 건입니다. 만들면 선생님들에게 보낼 서명 주소와 QR코드가 나옵니다.</p>
+  <section class="sheet"><div class="row sp"><h2>동의서(서명철) 고르기</h2><button class="btn sm ghost" data-act="mkRefresh">새로 고침</button></div>
+    <p class="hint">서명할 동의서를 고르고 [열기]를 누르세요. 안내문을 읽고 동의에 체크한 뒤 서명하면 됩니다.</p>
+    ${list}
+    <p class="hint">새 서명철 만들기·제목 바꾸기·명단·현황은 오른쪽 위 <b>🔑 관리자</b> → <b>서명철 관리</b>에서 합니다.</p></section>
+  ${helpBox()}
+  ${GAS ? '' : `<div class="row sp"><button class="btn ghost" data-act="home">← 이 기기에서 서명받기 모드로</button><span class="hint">서버 없이 태블릿 한 대로 돌려가며 받을 때</span></div>`}</main>`;
+}
+function aBooksServer() {
+  const mk = masterKey(); if (V.books === undefined) { V.books = null; setTimeout(loadBooks, 0); } const L = V.books;
+  if (!mk) return `<section class="sheet"><h3>제작자 키가 필요합니다</h3><p class="hint">서명철을 만들거나 관리하려면 제작자 키를 넣어 주세요.</p><div class="row"><button class="btn pri" data-act="toSign">처음 화면으로</button></div></section>`;
+  return `<section class="sheet"><div class="row sp"><h3>서명철 목록 <span class="muted" style="font-weight:500;font-size:13px">${L ? L.length + '개' : ''} · 구글 시트 서버</span></h3><button class="btn sm" data-act="mkRefresh">새로 고침</button></div>
+    ${L === null ? '<p class="hint">불러오는 중…</p>' : L.length ? `<div class="blist">${L.map(b => `<div class="bitem${b.pid === PID ? '' : ''}" style="${b.pid === PID ? 'border-color:var(--accent);background:var(--accent-soft)' : ''}"><div><b>${esc(b.title)}</b><div class="hint">만든 날 ${esc(String(b.created || '').slice(0, 10))} · 서명 ${b.count || 0}명 · ID <span class="mono">${esc(b.pid)}</span>${b.pid === PID ? ' · <b>지금 열려 있음</b>' : ''}</div></div><div class="row"><button class="btn pri sm" data-act="bkAdmin" data-pid="${esc(b.pid)}">${b.pid === PID ? '수정 중' : '열어서 수정'}</button><button class="btn sm" data-act="bkQr" data-pid="${esc(b.pid)}" data-title="${esc(b.title)}">📱 QR코드</button></div></div>`).join('')}</div>` : '<p class="muted">아직 서명철이 없습니다. 아래에서 만들어 주세요.</p>'}
+    <p class="hint">서명철 삭제는 그 서명철을 열어 연결·저장 → [받은 서명 모두 지우기]로 비우거나, 구글 시트 '서명철' 탭에서 해당 줄을 지우면 됩니다.</p></section>
+  <section class="sheet"><h3>새 서명철 만들기</h3><p class="hint">서명철 하나가 동의서 한 건입니다. 만들면 바로 그 서명철의 안내문 탭으로 넘어가고, 첫 화면 목록에서 [📱 QR코드]를 누르면 QR이 나옵니다.</p>
     <label class="f" for="nb_title">서명철 이름<input class="in" id="nb_title" maxlength="60" placeholder="예: ○○학교 2027 연구학교 공모 동의서"></label>
-    <div class="g2"><label class="f" for="nb_pw">관리자 암호 (4자 이상)<input class="in" id="nb_pw" type="password" maxlength="60" autocomplete="new-password"></label>
-    <label class="f" for="nb_code">${PERSONAL ? '제작자 키' : '승인 코드'}<input class="in" id="nb_code" maxlength="60" autocomplete="off" placeholder="${PERSONAL ? 'Code.gs의 INITIAL_MASTER_KEY' : '공장장에게 받은 코드'}"></label></div>
-    ${PERSONAL ? `<p class="hint">개인용은 제작자 키(서버 설치 때 정한 INITIAL_MASTER_KEY)로 서명철을 만듭니다.</p>` : `<p class="hint">승인 코드는 <a href="${HOTLINE_URL}?page=apply" target="_blank" rel="noopener">공장장 핫라인 대나무숲 신청창 ↗</a>에서 사용 신청을 하면 받을 수 있습니다. 제작자는 제작자 키를 넣습니다.</p>`}
+    <div class="g2"><label class="f" for="nb_pw">관리자 암호 (4자 이상)<input class="in" id="nb_pw" type="password" maxlength="60" autocomplete="new-password" value="${esc(mk)}"></label>
+    <label class="f" for="nb_code">${PERSONAL ? '제작자 키' : '승인 코드'}<input class="in" id="nb_code" maxlength="60" autocomplete="off" value="${esc(mk)}" placeholder="${PERSONAL ? 'Code.gs의 INITIAL_MASTER_KEY' : '공장장에게 받은 코드'}"></label></div>
+    ${PERSONAL ? `<p class="hint">개인용은 제작자 키로 서명철을 만듭니다.</p>` : `<p class="hint">승인 코드는 <a href="${HOTLINE_URL}?page=apply" target="_blank" rel="noopener">공장장 핫라인 대나무숲 신청창 ↗</a>에서 사용 신청을 하면 받을 수 있습니다. 제작자는 제작자 키를 넣습니다.</p>`}
     <button class="btn pri" data-act="createBook">서명철 만들기</button></section>
-  ${GAS ? '' : `<div class="row sp"><button class="btn ghost" data-act="home">← 처음 화면으로 (이 기기에서 서명받기)</button><span class="hint">서버 연결을 끊고 파일을 처음 연 상태로 돌아갑니다.</span></div>`}</main>`;
+  ${(lb => lb.length ? `<section class="sheet"><h3>이 기기에만 저장된 서명철 ${lb.length}개</h3><p class="hint">서버에 연결하기 전에 <b>이 기기의 브라우저에만</b> 저장해 둔 서명철입니다. 그대로 두면 다른 휴대폰·아이패드에서는 보이지 않습니다. 구글 시트로 옮기면 설정·안내문·명단·서명이 모두 올라가 어느 기기에서나 보입니다. (이 기기의 원본은 지우지 않습니다)</p><div class="chips">${lb.map(bk => `<span class="chip">${esc(bk.title || '제목 없는 동의서')} · 서명 ${localCount(bk.id)}명</span>`).join('')}</div><div class="row"><button class="btn pri" data-act="lmig">구글 시트로 옮기기</button></div></section>` : '')(localOnly())}
+  <section class="sheet"><h3>백업 파일로 서명철 가져오기</h3><p class="hint">백업 파일(.json)을 고르면 구글 시트에 <b>새 서명철</b>로 들어옵니다(설정·안내문·명단·서명 모두). 다른 기기에서 받은 백업, ‘모든 서명철 백업’도 됩니다. 관리자 암호는 제작자 키와 같게 만들어지고, 들어온 서명의 ‘서명한 때’는 가져온 시각으로 적힙니다.</p><div class="row"><label class="btn" for="bk_srv">백업 파일 열기<input type="file" id="bk_srv" accept=".json,application/json" multiple hidden></label></div></section>
+  <section class="sheet"><h3>서명철 ID나 주소로 열기</h3><p class="hint">다른 선생님이 만든 서명철을 열 때 씁니다.</p><div class="row"><input class="in grow" id="op_pid" autocomplete="off" placeholder="서명철 ID 8글자 또는 서명 주소"><button class="btn" data-act="openBook">열기</button></div></section>
+  <section class="sheet"><h3>제작자 키</h3><p class="hint">이 기기에 기억된 제작자 키로 목록을 불러오고 관리자로 바로 들어갑니다.</p><div class="row"><button class="btn sm ghost" data-act="mkForget">이 기기에서 제작자 키 지우기</button></div></section>`;
 }
 
 /* ---------- 배포용: 사용 승인 ---------- */
@@ -713,26 +1196,52 @@ function vGate() {
 
 /* ---------- 관리자 암호 ---------- */
 function vLogin() {
+  if (SERVER && !PID) return `<main class="wrap narrow"><section class="sheet"><h2>관리자 · 제작자 키</h2>
+  <p class="hint">서명철을 만들고 관리하는 제작자(공장장)용 화면입니다. 동의서 구글 시트 → Apps Script → <span class="mono">Code.gs</span> 맨 위 <span class="mono">INITIAL_MASTER_KEY</span>에 적은 글자를 넣어 주세요. 서명만 하는 분은 이 화면이 필요 없습니다.</p>
+  <label class="f" for="pw1">제작자 키<input class="in" id="pw1" type="password" maxlength="60" autocomplete="off"></label>
+  <label class="chk" for="mk_keep"><input type="checkbox" id="mk_keep" checked> <span>이 기기에서 기억하기 (내 컴퓨터에서만 체크하세요)</span></label>
+  <div class="row"><button class="btn pri" data-act="login">들어가기</button><button class="btn ghost" data-act="toSign">← 처음 화면으로</button></div></section></main>`;
   const first = !SERVER && !devPw() && !S.cfg.pwHash;
   return `<main class="wrap narrow"><section class="sheet"><h2>${first ? '관리자 암호 정하기' : '관리자 암호'}</h2>
   ${first ? `<p class="hint">처음입니다. 서명 현황·인쇄·설정을 여는 암호를 정해 주세요. 잊으면 되찾을 수 없으니 적어 두세요.</p><label class="f" for="pw1">새 암호 (4자 이상)<input class="in" id="pw1" type="password" maxlength="60" autocomplete="new-password"></label><label class="f" for="pw2">한 번 더<input class="in" id="pw2" type="password" maxlength="60" autocomplete="new-password"></label>`
-      : `<label class="f" for="pw1">암호<input class="in" id="pw1" type="password" maxlength="60" autocomplete="current-password"></label>${V.needCode ? `<div class="note warn"><b>승인 코드의 사용 기간이 끝났습니다.</b> 기간을 연장한 새 승인 코드를 함께 넣어 주세요.</div><label class="f" for="pwcode">새 승인 코드<input class="in" id="pwcode" maxlength="60" autocomplete="off"></label>` : ''}`}
+      : `<label class="f" for="pw1">암호<input class="in" id="pw1" type="password" maxlength="60" autocomplete="current-password" value="${esc(SERVER ? masterKey() : '')}"></label>${V.needCode ? `<div class="note warn"><b>승인 코드의 사용 기간이 끝났습니다.</b> 기간을 연장한 새 승인 코드를 함께 넣어 주세요.</div><label class="f" for="pwcode">새 승인 코드<input class="in" id="pwcode" maxlength="60" autocomplete="off"></label>` : ''}`}
   <div class="row"><button class="btn pri" data-act="login">${first ? '암호 정하고 들어가기' : '들어가기'}</button><button class="btn ghost" data-act="toSign">← 서명 화면으로</button></div></section></main>`;
 }
 
 /* ---------- 관리자 ---------- */
-const TABS = [['status', '서명 현황'], ['form', '서식 · 출력'], ['notice', '안내문'], ['tpl', '서식 설정'], ['roster', '서명 대상'], ['link', '연결 · 저장']];
+const TABS = [['status', '서명 현황'], ['qr', 'QR코드'], ['form', '서식 · 출력'], ['notice', '안내문'], ['tpl', '서식 설정'], ['roster', '서명 대상'], ['link', '연결 · 저장']];
 function aBooks() {
   const a = localBooks();
   return `<section class="sheet"><h3>서명철 목록 <span class="muted" style="font-weight:500;font-size:13px">${a.length}개 · 이 기기에 저장</span></h3><p class="hint">서명철을 누르면 바로 그 서명철의 관리자 화면으로 바뀌어, 안내문·서식·명단을 고칠 수 있습니다. 제목은 여기서 바로 바꿀 수 있습니다.</p>
   <div class="blist">${a.length ? a.map(b => `<div class="bitem${b.id === LBID ? '' : ''}" style="${b.id === LBID ? 'border-color:var(--accent);background:var(--accent-soft)' : ''}"><div class="grow" style="display:flex;flex-direction:column;gap:6px"><div class="row"><input class="in" id="bt_${esc(b.id)}" maxlength="80" value="${esc(b.title || '')}" style="flex:1 1 220px;min-height:36px" aria-label="서명철 제목"><button class="btn sm" data-act="bRename" data-id="${esc(b.id)}">제목 저장</button></div><div class="hint">만든 날 ${fmtT(b.created)} · 서명 ${localCount(b.id)}명${b.id === LBID ? ' · <b>지금 열려 있음</b>' : ''}</div></div><div class="row"><button class="btn pri sm" data-act="bOpen" data-id="${esc(b.id)}">${b.id === LBID ? '수정 중' : '열어서 수정'}</button><button class="btn sm danger" data-act="ldel" data-id="${esc(b.id)}" data-confirm="한 번 더 누르면 삭제">삭제</button></div></div>`).join('') : '<p class="muted">아직 서명철이 없습니다. 아래에서 만들어 주세요.</p>'}</div></section>
-  <section class="sheet"><h3>새 서명철 만들기</h3><label class="f" for="lb_title">동의서 제목<input class="in" id="lb_title" maxlength="80" placeholder="예: 2027학년도 연구학교 공모 동의서"></label><p class="hint">만들면 바로 그 서명철의 관리자 화면(안내문)으로 넘어갑니다. 관리자 암호는 이 기기의 관리자 암호와 같습니다.</p><button class="btn pri" data-act="lcreate">서명철 만들기</button></section>`;
+  <section class="sheet"><h3>새 서명철 만들기</h3><label class="f" for="lb_title">동의서 제목<input class="in" id="lb_title" maxlength="80" placeholder="예: 2027학년도 연구학교 공모 동의서"></label><p class="hint">만들면 바로 그 서명철의 관리자 화면(안내문)으로 넘어갑니다. 관리자 암호는 이 기기의 관리자 암호와 같습니다.</p><button class="btn pri" data-act="lcreate">서명철 만들기</button></section>
+  <section class="sheet"><h3>백업 파일로 서명철 가져오기</h3><p class="hint">다른 기기나 예전에 저장한 백업 파일(.json)을 불러오면 <b>새 서명철</b>로 들어옵니다(설정·안내문·명단·서명 모두). 서명철 하나짜리 백업과 '모든 서명철 백업' 둘 다 됩니다.</p>
+    <div class="row"><label class="btn pri" for="bk_all">백업 파일 열기<input type="file" id="bk_all" accept=".json,application/json" multiple hidden></label><button class="btn" data-act="backupAll">모든 서명철 백업 저장 (${a.length}개)</button></div></section>
+  <section class="sheet"><h3>구글 시트 서버로 연결</h3><p class="hint">각자 휴대폰으로 서명받으려면 서버가 필요합니다. 서버 주소를 넣고 연결하면 QR 서명이 되고, 서명이 구글 시트에 모여 어느 기기에서나 보입니다. 연결한 뒤 🔑 관리자 → 서명철 관리에서 <b>[구글 시트로 옮기기]</b>를 누르면 이 기기의 서명철(설정·명단·서명)도 서버로 올라갑니다.</p>
+    ${IN_ART ? '<p class="hint">claude.ai 화면에서는 서버 연결이 되지 않습니다. GitHub 주소나 구글 웹 앱 주소로 열어 주세요.</p>' : `<div class="row"><input class="in grow" id="lk_api2" placeholder="https://script.google.com/macros/s/…/exec"><button class="btn" data-act="goServer2">이 서버로 연결해서 열기</button></div>`}</section>`;
+}
+function importBackupObj(o) {
+  const books = o && o.app === 'dsign-all' && Array.isArray(o.books) ? o.books : (o && o.app === 'dsign' ? [o] : null);
+  if (!books) throw new Error('이 프로그램의 백업 파일이 아닙니다.');
+  const a = localBooks(); let n = 0, lastId = '';
+  books.forEach((bk, i) => {
+    const cfg = normCfg(bk.cfg); const title = String(bk.title || fill(cfg.tpl.title, 0) || '가져온 서명철').slice(0, 80);
+    const id = 'B' + Date.now().toString(36) + i; a.push({ id, title, created: bk.at || new Date().toISOString() });
+    cfg.pwHash = devPw() || cfg.pwHash;
+    LS.set(LKEY + ':' + id, JSON.stringify({ cfg, roster: Array.isArray(bk.roster) ? bk.roster : [], sigs: (Array.isArray(bk.sigs) ? bk.sigs : []).filter(s => s && s.id && Array.isArray(s.strokes)) })); n++; lastId = id;
+  });
+  saveBooks(a); return { n, lastId };
+}
+function adminQrBox() {
+  const link = signerLink(); if (!SERVER || !link || V.tab === 'qr') return '';
+  return `<section class="sheet" style="flex-direction:row;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px"><div class="qr sm" data-qr id="qr-admin" aria-label="서명 주소 QR코드"></div><div class="grow" style="min-width:240px"><b>📱 휴대폰 서명 주소 · QR코드</b><div class="linkbox" id="linktxt" style="margin-top:6px">${esc(link)}</div><div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="copyLink">주소 복사</button><button class="btn sm" data-act="qrPng">QR 그림 저장</button><button class="btn sm" data-act="qrPrint">QR 안내문 인쇄</button><span class="pill">ID <b class="mono" style="margin-left:4px">${esc(PID)}</b></span></div></div></section>`;
 }
 function vAdmin() {
-  const tabs = SERVER ? TABS : (LBID ? [['books', '서명철 관리']].concat(TABS) : [['books', '서명철 관리']]);
+  const has = SERVER ? !!PID : !!LBID;
+  const tabs = has ? [['books', '서명철 관리']].concat(TABS) : [['books', '서명철 관리']];
   if (!tabs.some(t => t[0] === V.tab)) V.tab = tabs[0][0];
-  const body = { books: aBooks, status: aStatus, form: aForm, notice: aNotice, tpl: aTpl, roster: aRoster, link: aLink }[V.tab]();
-  return `<main class="wrap"><div class="tabs" role="tablist">${tabs.map(t => `<button class="tab" role="tab" data-tab="${t[0]}" aria-selected="${V.tab === t[0]}">${t[1]}</button>`).join('')}</div>${body}</main>`;
+  const body = { books: SERVER ? aBooksServer : aBooks, qr: aQr, status: aStatus, form: aForm, notice: aNotice, tpl: aTpl, roster: aRoster, link: aLink }[V.tab]();
+  return `<main class="wrap">${adminQrBox()}<div class="tabs" role="tablist">${tabs.map(t => `<button class="tab" role="tab" data-tab="${t[0]}" aria-selected="${V.tab === t[0]}">${t[1]}</button>`).join('')}</div>${body}</main>`;
 }
 function aStatus() {
   const n = S.sigs.length, st = stats(n), g = geom(S.cfg.tpl), pages = Math.max(1, Math.ceil(n / g.rpp));
@@ -757,11 +1266,28 @@ function sigTable(cols) {
   if (!rows.length) return `<p class="muted">'${esc(V.sigQ)}'(으)로 찾은 사람이 없습니다.</p>`;
   return `<div class="tw"><table class="t"><thead><tr><th>순</th>${cols.map(c => `<th>${esc(c.label)}</th>`).join('')}<th>서명</th><th>서명한 때</th><th>구분</th><th></th></tr></thead><tbody>${rows.map(({ s, i }) => `<tr${q ? ' style="background:var(--accent-soft)"' : ''}><td class="n">${i + 1}</td>${cols.map(c => `<td>${esc(s.f[c.k] || '')}</td>`).join('')}<td><img class="sigthumb" src="${sigPng(s, 110, 30)}" alt="${esc(s.f.name || '')} 서명"></td><td class="n">${fmtT(s.at)}</td><td>${s.rid ? '<span class="pill ok">명단</span>' : s.outside ? '<span class="pill warn">명단 외</span>' : '<span class="pill">직접 입력</span>'}</td><td><button class="btn sm danger" data-act="delSig" data-id="${esc(s.id)}" data-confirm="한 번 더 누르면 ${esc(s.f.name || '')} 삭제">삭제</button></td></tr>`).join('')}</tbody></table></div>`;
 }
+function aQr() {
+  const link = signerLink(), api = (() => { try { return localStorage.getItem('dsign-api') || DEFAULT_API || ''; } catch (e) { return DEFAULT_API || ''; } })();
+  const server = SERVER ? `<section class="sheet"><h3>이 서명철의 휴대폰 서명 QR코드</h3>
+    <div class="row" style="align-items:flex-start;gap:20px"><div class="qr" data-qr id="qr-tab" aria-label="서명 주소 QR코드" style="width:270px;height:270px"></div>
+    <div class="grow" style="display:flex;flex-direction:column;gap:10px"><div><b>서명 주소</b><div class="linkbox" style="margin-top:4px">${esc(link)}</div></div>
+    <div class="row"><button class="btn pri" data-act="qrPng">QR 그림 저장 (PNG)</button><button class="btn" data-act="qrPrint">QR 안내문 인쇄 (A4)</button><button class="btn" data-act="copyLink">주소 복사</button></div>
+    <ol class="how"><li>이 QR을 찍으면 <b>${esc(BOOK.title || fill(S.cfg.tpl.title, 0))}</b> 서명 화면이 휴대폰에 열립니다.</li><li>QR 주소는 휴대폰에서 바로 열리는 서명 페이지 주소로 <b>자동으로</b> 만들어집니다. 네이버·카톡 앱 카메라로 찍어도 됩니다.</li><li>서명은 구글 시트의 이 서명철에 모이고, [서명 현황]에 바로 보입니다.</li></ol></div></div></section>`
+  : `<section class="sheet"><h3>QR코드는 서버에 연결된 서명철에서 만들어집니다</h3>
+    <p>지금은 <b>이 기기에 저장</b> 모드라서, 다른 사람의 휴대폰이 이 컴퓨터 안의 서명철에 닿을 수 없습니다. 아래에 구글 시트 서버 주소를 넣고 연결하면 서버 모드로 열리고, 거기서 서명철을 만들면 이 탭에 QR코드가 나옵니다.</p>
+    ${IN_ART ? '<p class="hint">claude.ai 화면에서는 서버 연결이 되지 않습니다. GitHub 주소(…/sign/)나 구글 웹 앱 주소로 열어 주세요.</p>' : `<label class="f" for="lk_api3">구글 시트 서버 주소 (Apps Script › 배포 관리 › 웹 앱 URL · …/exec)<input class="in" id="lk_api3" value="${esc(api)}" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <div class="row"><button class="btn pri" data-act="goServer3">이 서버로 연결해서 열기</button></div>
+    <ol class="how" style="margin-top:6px"><li>연결되면 첫 화면에 제작자 키를 넣어 <b>내 서명철</b> 목록을 봅니다.</li><li>서명철을 만들거나 [관리자로 열기]를 누릅니다.</li><li>관리자 화면 맨 위와 이 [QR코드] 탭에 QR이 나옵니다. [QR 그림 저장]으로 받으세요.</li></ol>`}</section>`;
+  return `${server}
+  <section class="sheet"><h3>다른 주소로 QR코드 만들기</h3><p class="hint">서명용 QR은 위에서 자동으로 만들어지므로 이 칸은 쓰지 않아도 됩니다. 패들렛·구글 설문·안내 페이지 등 <b>다른 주소</b>의 QR이 필요할 때만 쓰세요.</p>
+    <div class="row"><input class="in grow" id="qr_free" placeholder="https://…" value="${esc(V.qrFree || '')}"><button class="btn" data-act="qrFree">QR 만들기</button></div>
+    ${V.qrFree ? `<div class="row" style="align-items:flex-start;gap:16px"><div class="qr" id="qr-free" aria-label="QR코드" style="width:180px;height:180px"></div><div class="row"><button class="btn pri" data-act="qrFreePng">QR 그림 저장</button></div></div>` : ''}</section>`;
+}
 function aForm() {
   const n = S.sigs.length, g = geom(S.cfg.tpl);
   return `<section class="sheet"><div class="row sp"><h3>동의서 서식 <span class="muted" style="font-weight:500;font-size:13px">${n}명 · ${Math.max(1, Math.ceil(n / g.rpp))}쪽</span></h3>
   <div class="row">${IN_ART ? '' : `<button class="btn pri" data-act="print">인쇄</button>`}<button class="btn ${IN_ART ? 'pri' : ''}" data-act="pdf">PDF 저장</button><button class="btn" data-act="hwp">전체 복사 (한글용)</button><button class="btn" data-act="xlsx">엑셀 저장</button><button class="btn" data-act="tsv">구글 시트용 복사</button><button class="btn" data-act="png">그림 저장</button></div></div>
-  <p class="hint">${IN_ART ? 'claude.ai 화면에서는 인쇄 창이 열리지 않습니다. [PDF 저장]으로 받은 파일을 열어 인쇄하세요. ' : '[인쇄]를 누른 뒤 프린터 대신 ‘PDF로 저장’을 골라도 됩니다. 인쇄 창의 배율은 100%, 여백은 ‘없음’으로 두세요(여백·간격은 [서식 설정] 아래쪽에서 바꿉니다). '}[전체 복사 (한글용)]은 표와 서명을 그대로 복사합니다. 한글에서 Ctrl+V로 붙여 넣으세요.</p></section>
+  <p class="hint">${IN_ART ? 'claude.ai 화면에서는 인쇄 창이 열리지 않습니다. [PDF 저장]으로 받은 파일을 열어 인쇄하세요. ' : '[인쇄]를 누른 뒤 프린터 대신 ‘PDF로 저장’을 골라도 됩니다. 인쇄 창의 배율은 100%, 여백은 ‘없음’으로 두세요(여백·간격은 [서식 설정] 아래쪽에서 바꿉니다). '}[전체 복사 (한글용)]은 표와 서명을 그대로 복사합니다. 한글에서 Ctrl+V로 붙여 넣으세요.${S.cfg.tpl.pdf ? ' <b>PDF 서식</b>을 쓰는 중이라 인쇄·PDF·그림은 올린 서식 모양으로 나가고, 한글용 복사와 엑셀은 표로 나갑니다.' : ''}</p></section>
   <div class="pages">${pagesAll().map(fitBox).join('')}</div>`;
 }
 function aNotice() {
@@ -779,22 +1305,23 @@ function aNotice() {
     <input class="in" style="flex:1 1 150px" maxlength="120" placeholder="설명 (선택)" value="${esc(m.cap || '')}" data-m="${i}" data-k="cap" aria-label="설명">
     <span class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm" data-act="mUp" data-i="${i}"${i ? '' : ' disabled'} aria-label="위로">↑</button><button class="btn sm" data-act="mDown" data-i="${i}"${i < n.media.length - 1 ? '' : ' disabled'} aria-label="아래로">↓</button><button class="btn sm danger" data-act="mDel" data-i="${i}">빼기</button></span></div></div></div>`).join('') : '<span class="hint">넣은 첨부가 없습니다. 순서는 ↑↓, 크기는 너비, 자리는 왼쪽·가운데·오른쪽으로 정합니다.</span>'}</div></div>
   <label class="f" for="nt_agree">동의 확인 문구 (체크 칸 옆 글)<input class="in" id="nt_agree" maxlength="120" value="${esc(n.agree)}"></label>
-  <div class="row end"><button class="btn pri" data-act="saveNotice">안내문 저장</button></div></section>`;
+  <div class="row end">${SERVER && signerLink() ? `<button class="btn" data-act="qrPrint">안내문 인쇄 (QR 포함)</button>` : ''}<button class="btn pri" data-act="saveNotice">안내문 저장</button></div></section>`;
 }
 function aTpl() {
   const t = S.cfg.tpl;
   return `<section class="sheet"><div class="row sp"><h3>서식 설정</h3><div class="row"><select class="in" id="tp_preset" style="width:auto;min-height:36px;font-size:14px" aria-label="서식 틀 고르기"><option value="">서식 틀 불러오기…</option>${Object.keys(PRESETS).map(k => `<option value="${k}">${esc(PRESETS[k].name)}</option>`).join('')}</select><button class="btn sm" data-act="preset" data-confirm="한 번 더 누르면 틀로 바꿈">불러오기</button></div></div>
   <p class="hint">칸 이름·줄 수·문구를 바꾸면 다른 동의서·서명부에도 쓸 수 있습니다. 글 안에 <span class="mono">{학교} {전체} {동의} {율} {오늘}</span>을 적으면 자동으로 채워집니다.</p>
+  ${pdfEdHTML()}
   
   <div class="g2"><label class="f" for="tp_school">학교(기관)명<input class="in" id="tp_school" maxlength="40" value="${esc(S.cfg.school)}" placeholder="예: ○○학교"></label><label class="f" for="tp_total">전체 인원 (비우면 명단 인원)<input class="in" id="tp_total" inputmode="numeric" maxlength="5" value="${esc(S.cfg.total)}"></label></div>
   <div class="g2"><label class="f" for="tp_formNo">서식 번호<input class="in" id="tp_formNo" maxlength="30" value="${esc(t.formNo)}"></label><label class="f" for="tp_title">서식 제목<input class="in" id="tp_title" maxlength="80" value="${esc(t.title)}"></label></div>
   <label class="chk" for="tp_sumOn"><input type="checkbox" id="tp_sumOn"${t.sumOn ? ' checked' : ''}> <span>위쪽 요약 표 넣기</span></label>
   <div class="g4">${t.sumCols.map((c, i) => `<label class="f" for="tp_sc${i}">요약 ${i + 1} 머리<input class="in" id="tp_sc${i}" maxlength="30" value="${esc(c)}"></label>`).join('')}${t.sumVals.map((c, i) => `<label class="f" for="tp_sv${i}">요약 ${i + 1} 값<input class="in" id="tp_sv${i}" maxlength="30" value="${esc(c)}"></label>`).join('')}</div>
   <label class="f" for="tp_note">표 위 안내 줄<input class="in" id="tp_note" maxlength="80" value="${esc(t.note)}"></label>
-  <div><b style="font-size:13px;color:var(--muted)">표의 칸 (왼쪽부터) · 이름 / 종류 / 너비</b>
+  ${t.pdf ? `<p class="hint">표의 칸(직·성명 등)은 위 <b>‘사람마다 넣는 칸’</b>에서 이름을 바꾸고, 넣고, 뺍니다.</p>` : `<div><b style="font-size:13px;color:var(--muted)">표의 칸 (왼쪽부터) · 이름 / 종류 / 너비</b>
   <div class="cols" id="tp_cols" style="margin-top:8px">${t.cols.map((c, i) => `<div class="colrow"><input class="in" id="tc_l${i}" maxlength="20" value="${esc(c.label)}" aria-label="칸 ${i + 1} 이름"><span class="pill">${{ seq: '순번', sel: '고르기', name: '성명', text: '글자', sign: '서명' }[c.type]}</span><input class="in" id="tc_w${i}" type="number" min="3" max="60" value="${c.w}" aria-label="칸 ${i + 1} 너비"><span class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm" data-act="colUp" data-i="${i}" aria-label="칸 ${i + 1} 왼쪽으로"${i ? '' : ' disabled'}>←</button><button class="btn sm danger" data-act="colDel" data-i="${i}" aria-label="칸 ${i + 1} 빼기"${c.type === 'name' || c.type === 'sign' ? ' disabled' : ''}>빼기</button></span></div>`).join('')}</div>
   <div class="row" style="margin-top:8px"><button class="btn sm" data-act="colAdd" data-type="text">+ 글자 칸</button>${t.cols.some(c => c.type === 'sel') ? '' : `<button class="btn sm" data-act="colAdd" data-type="sel">+ 고르기 칸 (직)</button>`}${t.cols.some(c => c.type === 'seq') ? '' : `<button class="btn sm" data-act="colAdd" data-type="seq">+ 순번 칸</button>`}</div></div>
-  ${t.cols.some(c => c.type === 'sel') ? `<label class="f" for="tp_opts">고르기 칸의 항목 (쉼표로 구분 · 비우면 직접 적는 칸이 됩니다)<textarea class="in" id="tp_opts" rows="2" maxlength="600">${esc(((t.cols.find(c => c.type === 'sel') || {}).opts || []).join(', '))}</textarea></label>` : ''}
+  ${t.cols.some(c => c.type === 'sel') ? `<label class="f" for="tp_opts">고르기 칸의 항목 (쉼표로 구분 · 비우면 직접 적는 칸이 됩니다)<textarea class="in" id="tp_opts" rows="2" maxlength="600">${esc(((t.cols.find(c => c.type === 'sel') || {}).opts || []).join(', '))}</textarea></label>` : ''}`}
   <div class="g3"><label class="f" for="tp_blocks">옆으로 나눈 단 수<select class="in" id="tp_blocks">${[1, 2, 3].map(v => `<option${t.blocks === v ? ' selected' : ''}>${v}</option>`).join('')}</select></label><label class="f" for="tp_rows">한 쪽 인원 (넘으면 다음 쪽)<input class="in" id="tp_rows" type="number" min="1" max="90" value="${t.rows}"></label><label class="f" for="tp_rowH">줄 높이<input class="in" id="tp_rowH" type="number" min="17" max="48" value="${t.rowH}"></label></div>
   <label class="f" for="tp_statement">표 아래 문장<input class="in" id="tp_statement" maxlength="120" value="${esc(t.statement)}"></label>
   <div class="g3"><label class="f" for="tp_date">날짜<input class="in" id="tp_date" maxlength="40" value="${esc(t.date)}"></label><label class="f" for="tp_signer">제출자 (직인)<input class="in" id="tp_signer" maxlength="60" value="${esc(t.signer)}"></label><label class="f" for="tp_recipient">받는 곳<input class="in" id="tp_recipient" maxlength="60" value="${esc(t.recipient)}"></label></div>
@@ -831,16 +1358,17 @@ function aRoster() {
 function aLink() {
   const link = signerLink();
   return `${SERVER ? `<section class="sheet"><h3>휴대폰 서명 주소</h3><p class="hint">이 주소(또는 QR코드)를 패들렛·메신저로 보내면, 받은 분이 자기 휴대폰에서 안내문을 읽고 서명합니다. 모든 서명은 이 서명철 한 곳에 모입니다.</p>
-    <div class="row" style="align-items:flex-start"><div class="qr" id="qr" data-qr aria-label="서명 주소 QR코드"></div><div class="grow" style="display:flex;flex-direction:column;gap:8px"><div class="linkbox" id="linktxt">${esc(link)}</div><div class="row"><button class="btn pri" data-act="copyLink">주소 복사</button><button class="btn" data-act="qrPng">QR 그림 저장</button><button class="btn" data-act="qrPrint">QR 안내문 인쇄</button><span class="pill">서명철 ID <b class="mono" style="margin-left:4px">${esc(PID)}</b></span>${BOOK.until ? `<span class="pill warn">승인 코드 ${esc(BOOK.until)}까지</span>` : ''}</div><p class="hint">서명하는 분의 안내 화면과 완료 화면에도 이 QR이 함께 보여서, PC에 띄워 두면 각자 휴대폰으로 서명할 수 있습니다. 공문·게시물에는 [QR 그림 저장]이나 [QR 안내문 인쇄]를 쓰세요.</p></div></div></section>`
+    <div class="row" style="align-items:flex-start"><div class="qr" id="qr" data-qr aria-label="서명 주소 QR코드"></div><div class="grow" style="display:flex;flex-direction:column;gap:8px"><div class="linkbox">${esc(link)}</div><div class="row"><button class="btn pri" data-act="copyLink">주소 복사</button><button class="btn" data-act="qrPng">QR 그림 저장</button><button class="btn" data-act="qrPrint">QR 안내문 인쇄</button><span class="pill">서명철 ID <b class="mono" style="margin-left:4px">${esc(PID)}</b></span>${BOOK.until ? `<span class="pill warn">승인 코드 ${esc(BOOK.until)}까지</span>` : ''}</div><p class="hint">서명하는 분의 안내 화면과 완료 화면에도 이 QR이 함께 보여서, PC에 띄워 두면 각자 휴대폰으로 서명할 수 있습니다. 공문·게시물에는 [QR 그림 저장]이나 [QR 안내문 인쇄]를 쓰세요.</p></div></div></section>`
     : `<section class="sheet"><h3>지금은 이 기기에서 서명을 받습니다</h3>
     <p>${CLOUD_ON() ? '서명과 설정은 선생님의 <b>Claude 클라우드</b>에 저장되어, 같은 계정으로 연 다른 기기에서도 보입니다.' : '서명과 설정은 <b>이 기기의 브라우저</b>에 저장됩니다.'} 태블릿이나 휴대폰 한 대를 돌려 가며 서명받을 때 알맞습니다. [서명 화면으로 (잠그기)]를 누르고 기기를 넘기면, 관리자 화면은 암호로 잠기고 한 사람이 끝날 때마다 [다음 사람 서명하기]로 이어집니다.</p>
     <div class="note"><b>각자 자기 휴대폰으로 서명받으려면</b> 구글 시트 서버가 필요합니다. claude.ai 화면은 바깥 서버와 연결할 수 없어서, 서버를 설치하면 나오는 <b>구글 주소(…/exec)</b>가 휴대폰 서명 주소가 됩니다. 그 주소에서 이 프로그램과 똑같은 화면이 열리고, 서명은 구글 시트에 바로 저장됩니다. 설치 방법은 제작자가 함께 드린 ‘구글 시트 서버 설치 안내’를 따르세요.</div>
     ${IN_ART ? '' : `<label class="f" for="lk_api">구글 시트 서버 주소 (…/exec)<input class="in" id="lk_api" placeholder="https://script.google.com/macros/s/…/exec"></label><div class="row"><button class="btn" data-act="goServer">이 서버로 연결해서 열기</button></div>`}</section>`}
+  ${bakeBox()}
   ${!SERVER && !PERSONAL ? `<section class="sheet"><h3>사용 승인</h3><p class="hint">${licInfo()}</p><div class="row"><a class="btn sm" href="${HOTLINE_URL}?page=apply" target="_blank" rel="noopener">공장장 핫라인 대나무숲 ↗</a><button class="btn sm" data-act="licForget">이 기기에서 승인 코드 지우기</button></div></section>` : ''}
   <section class="sheet"><h3>제작자 표시</h3><p class="hint">화면 위·아래에 보이는 제작자와 소속입니다. 이 서명철에 저장되고, 이 기기에서 새로 만드는 서명철에도 같은 값이 들어갑니다.</p><div class="g2"><label class="f" for="mk_name">제작자<input class="in" id="mk_name" maxlength="30" value="${esc(S.cfg.maker.name)}"></label><label class="f" for="mk_org">소속<input class="in" id="mk_org" maxlength="40" value="${esc(S.cfg.maker.org)}"></label></div><div class="row end"><button class="btn pri" data-act="saveMaker">제작자 표시 저장</button></div></section>
   <section class="sheet"><h3>관리자 암호 바꾸기</h3><div class="row"><label class="f grow" for="np1">새 암호 (4자 이상)<input class="in" id="np1" type="password" maxlength="60" autocomplete="new-password"></label><button class="btn" data-act="setPw" style="align-self:flex-end">암호 바꾸기</button></div></section>
-  <section class="sheet"><h3>백업과 초기화</h3><p class="hint">백업 파일에는 설정·명단·서명이 모두 들어 있습니다.${SERVER ? '' : ' 다른 기기로 옮길 때는 백업 파일을 저장한 뒤 그 기기에서 불러오세요.'}</p>
-    <div class="row"><button class="btn" data-act="backup">백업 파일 저장</button>${SERVER ? '' : `<label class="btn" for="bk_file">백업 불러오기<input type="file" id="bk_file" accept=".json,application/json" hidden></label>`}<button class="btn danger" data-act="clearSigs" data-confirm="한 번 더 누르면 서명 전체 삭제">받은 서명 모두 지우기</button>${!SERVER && LBID ? `<button class="btn danger" data-act="ldel" data-id="${esc(LBID)}" data-confirm="한 번 더 누르면 이 서명철 삭제">이 서명철 삭제 (설정·명단·서명 모두)</button>` : ''}</div></section>`;
+  <section class="sheet"><h3>백업과 초기화</h3><p class="hint">백업 파일에는 설정·명단·서명이 모두 들어 있습니다.${SERVER ? ' [백업 불러오기]로 백업 파일을 고르면 이 서명철의 안내문·서식 설정·명단이 백업 내용으로 바뀌고, 백업에만 있는 서명이 더해집니다. 백업을 새 서명철로 따로 들이려면 [서명철 관리] 탭을 쓰세요.' : ' 다른 기기로 옮길 때는 백업 파일을 저장한 뒤 그 기기에서 불러오세요.'}</p>
+    <div class="row"><button class="btn" data-act="backup">백업 파일 저장</button><label class="btn" for="bk_file">백업 불러오기<input type="file" id="bk_file" accept=".json,application/json" hidden></label><button class="btn danger" data-act="clearSigs" data-confirm="한 번 더 누르면 서명 전체 삭제">받은 서명 모두 지우기</button>${!SERVER && LBID ? `<button class="btn danger" data-act="ldel" data-id="${esc(LBID)}" data-confirm="한 번 더 누르면 이 서명철 삭제">이 서명철 삭제 (설정·명단·서명 모두)</button>` : ''}</div></section>`;
 }
 
 /* ===== 동의서 서명받기 · 화면 프로그램 (3/3: 동작·내보내기·저장) ===== */
@@ -849,25 +1377,27 @@ function render() {
   $('#app').innerHTML = head() + (fn ? fn() : `<main class="wrap narrow"><section class="sheet"><p class="muted">불러오는 중…</p></section></main>`) + foot();
   fitPages();
   if (V.view === 'sign') { PAD = makePad($('#pad'), $('#padhint')); if (V.padKeep) { PAD.set(V.padKeep); V.padKeep = null; } }
-  drawQRs();
+  drawQRs(); bindPdfEd();
 }
 function drawQRs() {
-  const els = $$('[data-qr]'), link = signerLink(); if (!els.length || !link) return;
-  need('qr').then(q => { els.forEach(el => { const qr = q(0, 'M'); qr.addData(link); qr.make(); el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); }); }).catch(() => { });
+  const els = $$('[data-qr]'), link = signerLink(), free = $('#qr-free');
+  if ((!els.length || !link) && !free) return;
+  need('qr').then(q => { if (link) els.forEach(el => { const qr = q(0, 'M'); qr.addData(link); qr.make(); el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 16, scalable: true }); });
+    if (free && V.qrFree) { const qr = q(0, 'M'); qr.addData(V.qrFree); qr.make(); free.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 16, scalable: true }); } }).catch(() => { });
 }
 /* QR + 제목 + 안내문을 그림(PNG)으로 */
-async function qrPoster() {
-  const q = await need('qr'), link = signerLink(), qr = q(0, 'M'); qr.addData(link); qr.make();
+async function qrPoster(linkIn, titleIn) {
+  const q = await need('qr'), link = linkIn || signerLink(), qr = q(0, 'M'); qr.addData(link); qr.make();
   const W = 900, H = 1200, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
   x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.fillStyle = '#111'; x.textAlign = 'center';
-  const title = BOOK.title || fill(S.cfg.tpl.title, 0) || APP_NAME, wrap = (t, max) => { const out = []; let cur = ''; for (const ch of t) { if (x.measureText(cur + ch).width > max) { out.push(cur); cur = ch; } else cur += ch; } if (cur) out.push(cur); return out.slice(0, 3); };
+  const title = titleIn || BOOK.title || fill(S.cfg.tpl.title, 0) || APP_NAME, wrap = (t, max) => { const out = []; let cur = ''; for (const ch of t) { if (x.measureText(cur + ch).width > max) { out.push(cur); cur = ch; } else cur += ch; } if (cur) out.push(cur); return out.slice(0, 3); };
   x.font = "bold 44px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif"; let y = 110; wrap(title, W - 120).forEach(l => { x.fillText(l, W / 2, y); y += 56; });
   x.font = "bold 36px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif"; x.fillStyle = '#1F4E79'; x.fillText('📱 휴대폰으로 QR을 찍어 서명해 주세요', W / 2, y + 30); y += 80;
   const n = qr.getModuleCount(), size = 620, cs = Math.floor(size / n), ox = Math.round((W - cs * n) / 2), oy = y + 10; x.fillStyle = '#111';
   for (let r = 0; r < n; r++) for (let cI = 0; cI < n; cI++) if (qr.isDark(r, cI)) x.fillRect(ox + cI * cs, oy + r * cs, cs, cs);
   y = oy + cs * n + 70; x.fillStyle = '#333'; x.font = "28px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
   ['① 안내문을 읽고 동의에 체크  ② 직·성명 확인  ③ 손가락으로 서명', '서명은 동의서 서식의 서명란에 자동으로 들어갑니다.'].forEach(l => { x.fillText(l, W / 2, y); y += 42; });
-  x.font = "24px 'IBM Plex Mono',Consolas,monospace"; x.fillStyle = '#666'; x.fillText('서명철 ID: ' + PID, W / 2, H - 50);
+  x.font = "24px 'IBM Plex Mono',Consolas,monospace"; x.fillStyle = '#666'; x.fillText(/[?&]p=([0-9A-Za-z]+)/.test(link) ? '서명철 ID: ' + link.match(/[?&]p=([0-9A-Za-z]+)/)[1] : link.slice(0, 60), W / 2, H - 50);
   return c;
 }
 function softRender() { const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return; if (V.view === 'admin' || V.view === 'intro') render(); }
@@ -886,6 +1416,7 @@ function licInfo() { const o = licGet(); if (!o) return '이 기기에는 승인
 
 /* ---------- 관리자 들어가기 ---------- */
 function goAdmin() {
+  if (SERVER && !PID) { if (!masterKey()) { V.view = 'login'; V.needCode = false; render(); const p = $('#pw1'); if (p) p.focus(); return; } ADMIN = true; V.view = 'admin'; V.tab = 'books'; render(); return; }
   if (ADMIN) { V.view = 'admin'; if (!SERVER && !LBID) V.tab = 'books'; render(); return; }
   if (!SERVER && !PERSONAL && !licOK()) { V.view = 'gate'; render(); return; }
   V.view = 'login'; V.needCode = false; render(); const p = $('#pw1'); if (p) p.focus();
@@ -897,6 +1428,12 @@ async function adminLoad() {
 }
 async function doLogin() {
   const pw = ($('#pw1') || {}).value || '';
+  if (SERVER && !PID) {
+    const k = pw.trim(); if (!k) { toast('제작자 키를 넣어 주세요.'); return; } busy('확인하는 중…');
+    try { await verifyMaster(k); busy(); if ($('#mk_keep') && $('#mk_keep').checked) LS.set('dsign-master', k); else MEM['dsign-master'] = k; ADMIN = true; V.view = 'admin'; V.tab = 'books'; V.err = ''; render(); }
+    catch (e) { busy(); let msg = keyHelp(e.message); try { const pj = await call('ping'); if (pj.masterSet === false) msg = '서버에 제작자 키가 아직 없습니다. Code.gs 맨 위 INITIAL_MASTER_KEY가 기본값 그대로입니다. 6자 이상으로 바꾸고 새 버전으로 배포해 주세요.'; } catch (x) { } toast(msg); }
+    return;
+  }
   if (!SERVER) {
     const h = hashPw(pw);
     if (!devPw() && !S.cfg.pwHash) { if (pw.length < 4) { toast('암호는 4자 이상으로 정해 주세요.'); return; } if (pw !== (($('#pw2') || {}).value || '')) { toast('두 암호가 서로 다릅니다.'); return; } LS.set('dsign-admin', h); if (LBID) { S.cfg.pwHash = h; persist('book'); } }
@@ -913,8 +1450,29 @@ function authLost(e) { if (e && e.code === 'auth') { ADMIN = false; TOKEN = ''; 
 async function saveCfg(msg) {
   if (!SERVER) { persist('book'); if (msg) toast(msg); return true; }
   busy('저장하는 중…');
-  try { const j = await call('adminSaveCfg', { cfg: S.cfg, title: fill(S.cfg.tpl.title, 0) || BOOK.title }); if (j.title) BOOK.title = j.title; busy(); if (msg) toast(msg); return true; }
-  catch (e) { busy(); toast(e.message); authLost(e); return false; }
+  for (let n = 0; ; n++) {
+    try { const j = await call('adminSaveCfg', { cfg: S.cfg, title: fill(S.cfg.tpl.title, 0) || BOOK.title }); if (j.title) BOOK.title = j.title; busy(); if (msg) toast(n ? msg + ' (서버에 맞게 서식 그림을 조금 줄였습니다)' : msg); return true; }
+    catch (e) {
+      /* 서버가 '너무 깁니다'라고 하면 PDF 서식 그림을 한 단계 줄여 다시 보낸다 (칸 자리는 쪽 기준이라 그대로) */
+      if (isTooBig(e) && n < 3 && await shrinkPdf()) { busy('서식 그림을 줄여 다시 저장하는 중…'); continue; }
+      busy(); toast(isTooBig(e) ? tooBigMsg(e) : e.message); authLost(e); return false;
+    }
+  }
+}
+/* 서버의 '설정 내용이 너무 깁니다'는 안내문 글이 아니라 그림(PDF 서식·첨부) 크기 때문에도 나온다 → 까닭을 바로 알려 준다 */
+const isTooBig = e => /너무 (깁니다|큽니다|많습니다)/.test((e && e.message) || '');
+function tooBigMsg(e) {
+  const P = S.cfg.tpl.pdf, m = S.cfg.notice.media.length; if (!P && !m) return e.message;
+  return `구글 시트 서버가 한 번에 받을 수 있는 크기를 넘어 저장하지 못했습니다. 안내문 글이 아니라 ${[P ? 'PDF 서식 그림' : '', m ? `안내문 첨부 ${m}개` : ''].filter(Boolean).join('과 ')}의 크기 때문입니다. ${m ? '[안내문]에서 첨부를 줄인 뒤 다시 저장해 주세요.' : '쪽이 더 단순한 PDF로 바꿔 올려 주세요.'}`;
+}
+async function shrinkPdf() {
+  const P = S.cfg.tpl.pdf; if (!P) return false;
+  try {
+    const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = P.src; }), w = Math.round(im.naturalWidth * 0.8); if (w < 640) return false;
+    const c = document.createElement('canvas'); c.width = w; c.height = Math.round(im.naturalHeight * 0.8); const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, c.width, c.height);
+    let src = c.toDataURL('image/webp', 0.8); if (!/^data:image\/webp/.test(src)) src = c.toDataURL('image/jpeg', 0.8);
+    if (src.length >= P.src.length * 0.95) return false; P.src = src; return true;
+  } catch (x) { return false; }
 }
 
 /* ---------- 본인 확인 ---------- */
@@ -980,10 +1538,10 @@ function readNotice() { if (!$('#nt_body')) return; const n = S.cfg.notice; n.gu
 async function addMedia(files) {
   readNotice(); const n = S.cfg.notice; let added = 0;
   for (const f of Array.from(files || [])) {
-    if (n.media.length >= 6) { toast('첨부는 6개까지 넣을 수 있습니다.'); break; }
+    const cap = S.cfg.tpl.pdf ? 5 : 6; if (n.media.length >= cap) { toast(cap < 6 ? 'PDF 서식을 쓰는 동안에는 첨부를 5개까지 넣을 수 있습니다.' : '첨부는 6개까지 넣을 수 있습니다.'); break; }
     try {
       if (/^image\/(png|jpeg|webp)$/.test(f.type)) { busy('그림을 줄이는 중…'); n.media.push({ t: 'img', src: await compressImg(f), name: f.name, w: 100, align: 'center', cap: '' }); added++; }
-      else if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) { busy('PDF를 그림으로 바꾸는 중…'); const pages = await pdfPages(f, 6 - n.media.length); pages.forEach((src, i) => n.media.push({ t: 'img', src, name: f.name.replace(/\.pdf$/i, '') + ' ' + (i + 1) + '쪽', w: 100, align: 'center', cap: '' })); added += pages.length; }
+      else if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) { busy('PDF를 그림으로 바꾸는 중…'); const pages = await pdfPages(f, cap - n.media.length); pages.forEach((src, i) => n.media.push({ t: 'img', src, name: f.name.replace(/\.pdf$/i, '') + ' ' + (i + 1) + '쪽', w: 100, align: 'center', cap: '' })); added += pages.length; }
       else { if (f.size > 150 * 1024) { toast(`${f.name}: 문서는 150KB까지 첨부할 수 있습니다. PDF로 바꾸거나 줄여 주세요.`); continue; } const src = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).replace(/^data:;/, 'data:application/octet-stream;')); r.onerror = () => rej(new Error('파일을 읽지 못했습니다.')); r.readAsDataURL(f); }); if (!safeData(src)) throw new Error('파일 형식을 읽지 못했습니다.'); n.media.push({ t: 'file', src, name: f.name.slice(0, 80), w: 100, align: 'left', cap: '' }); added++; }
     } catch (e) { toast(`${f.name}: ${e.message || '넣지 못했습니다.'}`); }
   }
@@ -1008,6 +1566,9 @@ function readTpl() {
   t.cols.forEach((c, i) => { c.label = val('tc_l' + i).trim() || c.label; c.w = +val('tc_w' + i) || c.w; });
   const o = $('#tp_opts'), sel = t.cols.find(c => c.type === 'sel'); if (o && sel) sel.opts = o.value.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
   if ($('#ly_padTop')) { const L = Object.assign({}, t.lay || {}); Object.keys(LAYD).forEach(k => { const el = $('#ly_' + k); if (el) L[k] = el.value; }); t.lay = L; }
+  if (t.pdf && $('#pf_per')) { const P = t.pdf; P.per = +val('pf_per') || P.per; if (val('pf_dy') !== '') P.dy = +val('pf_dy'); P.blocks = +val('pf_blocks') || 1; if (val('pf_dx') !== '') P.dx = +val('pf_dx');
+    $$('[data-ps]').forEach(el => { const x = P.st[+el.dataset.ps], k = el.dataset.k; if (x && (k === 'n' || k === 't')) x[k] = el.value; });
+    $$('[data-pc]').forEach(el => { const m = /^([fs])(\d+)$/.exec(el.dataset.pc), o = m && (m[1] === 'f' ? P.fields[+m[2]] : P.st[+m[2]]); if (o && el.value !== '') o[el.dataset.k] = +el.value; }); }
   S.cfg.tpl = normTpl(t);
 }
 
@@ -1060,16 +1621,16 @@ async function saveFile(name, blob) {
   }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000); toast('저장했습니다: ' + name); return true;
 }
-function doPrint() { $('#printRoot').innerHTML = pagesAll().map(p => `<div class="pg">${p}</div>`).join(''); setTimeout(() => window.print(), 80); }
+function doPrint() { const d = pdim(); setPageCss(d.w > d.h ? '@page{size:A4 landscape;margin:0}' : ''); $('#printRoot').innerHTML = pagesAll().map(p => `<div class="pg">${p}</div>`).join(''); setTimeout(() => window.print(), 80); }
 async function pageCanvases() {
   const h2c = await need('html2canvas'), host = document.createElement('div');
-  host.style.cssText = 'position:fixed;left:-10000px;top:0;width:' + PW + 'px;background:#fff'; host.innerHTML = pagesAll().join(''); document.body.appendChild(host);
+  host.style.cssText = 'position:fixed;left:-10000px;top:0;width:' + pdim().w + 'px;background:#fff'; host.innerHTML = pagesAll().join(''); document.body.appendChild(host);
   try { if (document.fonts && document.fonts.ready) await document.fonts.ready; const out = []; for (const el of Array.from(host.children)) out.push(await h2c(el, { scale: 2, backgroundColor: '#ffffff', logging: false })); return out; }
   finally { host.remove(); }
 }
 async function savePdf() {
   busy('PDF를 만드는 중…');
-  try { const cs = await pageCanvases(), J = await need('jspdf'), pdf = new J.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }); cs.forEach((c, i) => { if (i) pdf.addPage(); pdf.addImage(c.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, 210, 297); }); busy(); await saveFile(fname('pdf'), pdf.output('blob')); }
+  try { const cs = await pageCanvases(), J = await need('jspdf'), d = pdim(), mm = 210 / 794, pdf = new J.jsPDF({ unit: 'mm', format: 'a4', orientation: d.w > d.h ? 'landscape' : 'portrait', compress: true }); cs.forEach((c, i) => { if (i) pdf.addPage(); pdf.addImage(c.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, d.w * mm, d.h * mm); }); busy(); await saveFile(fname('pdf'), pdf.output('blob')); }
   catch (e) { busy(); toast(e.message || 'PDF를 만들지 못했습니다.'); }
 }
 async function savePng() {
@@ -1150,8 +1711,8 @@ async function onAct(act, b) {
   const t = S.cfg.tpl;
   switch (act) {
     case 'admin': goAdmin(); break;
-    case 'home': location.href = location.pathname; break;
-    case 'books': { ADMIN = false; TOKEN = ''; PID = ''; S = { cfg: defCfg(), roster: [], sigs: [], count: 0, rosterN: 0 }; BOOK = { title: '', until: '' }; resetSigner(); V.err = ''; V.view = 'landing';
+    case 'home': location.href = location.pathname + '?local=1'; break;
+    case 'books': { ADMIN = false; TOKEN = ''; PID = ''; S = { cfg: defCfg(), roster: [], sigs: [], count: 0, rosterN: 0 }; BOOK = { title: '', until: '' }; resetSigner(); V.err = ''; V.view = 'landing'; V.books = undefined;
       try { const u = new URL(location.href); u.searchParams.delete('p'); history.replaceState(null, '', u.pathname + (u.search || '')); } catch (x) { }
       render(); window.scrollTo(0, 0); { const el = $('#op_pid'); if (el) el.focus(); } break; }
     case 'toSign': { const was = ADMIN; ADMIN = false; TOKEN = ''; if (SERVER) { S.sigs = []; S.roster = []; } V.rdraft = null; resetSigner(); V.view = SERVER ? (PID ? 'intro' : 'landing') : (LBID ? 'intro' : 'llanding'); render(); window.scrollTo(0, 0); if (was) toast('관리자 화면을 잠갔습니다. 다시 들어가려면 암호가 필요합니다.'); break; }
@@ -1168,11 +1729,36 @@ async function onAct(act, b) {
     case 'licGo': { const code = val('lic_code'), k = LIC.check(code); if (!k.ok) { toast(k.msg); return; } LICMEM = { code: LIC.norm(code) }; if ($('#lic_keep').checked) LS.set('dsign-lic', JSON.stringify(LICMEM)); toast(`승인 코드가 확인되었습니다. ${k.until ? k.until + '까지' : '기한 없이'} 쓸 수 있습니다.`); goAdmin(); break; }
     case 'licForget': LICMEM = null; LS.del('dsign-lic'); ADMIN = false; V.view = 'intro'; render(); toast('이 기기에서 승인 코드를 지웠습니다.'); break;
     case 'login': doLogin(); break;
+    case 'mkGo': { const k = val('mk_key').trim(); if (!k) { toast('제작자 키를 넣어 주세요.'); return; } busy('확인하는 중…');
+      try { const j = await call('books', { master: k }); busy(); if ($('#mk_keep') && $('#mk_keep').checked) LS.set('dsign-master', k); else MEM['dsign-master'] = k; V.books = (j.books || []).sort((a, b) => String(b.created).localeCompare(String(a.created))); V.booksErr = ''; V.err = ''; render(); }
+      catch (e) { busy(); let msg = keyHelp(e.message); try { const pj = await call('ping'); if (pj.masterSet === false) msg = '서버에 제작자 키가 아직 없습니다. Code.gs 맨 위 INITIAL_MASTER_KEY가 기본값 그대로입니다. 6자 이상으로 바꾸고 새 버전으로 배포해 주세요.'; } catch (x) { } V.err = msg; render(); } break; }
+    case 'mkRefresh': V.books = undefined; render(); break;
+    case 'mkForget': LS.del('dsign-master'); delete MEM['dsign-master']; V.books = undefined; render(); toast('이 기기에서 제작자 키를 지웠습니다.'); break;
+    case 'bkAdmin': openBookAdmin(b.dataset.pid); break;
+    case 'bkQr': openQrModal(b.dataset.pid, b.dataset.title || '서명철'); break;
+    case 'lQr': openLocalQrModal(); break;
+    case 'goServer4': { const u = val('lk_api4').trim(); if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) { toast('주소는 https://script.google.com/macros/s/…/exec 형태여야 합니다.'); return; } try { localStorage.setItem('dsign-api', u); } catch (e) { } location.href = location.pathname + '?api=' + encodeURIComponent(u); break; }
+    case 'qrModalPng': case 'qrModalPrint': case 'qrModalCopy': {
+      const m = $('#modal'); if (!m) break; const link = m.dataset.link, title = m.dataset.title;
+      if (act === 'qrModalCopy') { try { await navigator.clipboard.writeText(link); toast('주소를 복사했습니다.'); } catch (e) { const el = $('.linkbox', m); if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast('주소를 선택했습니다. Ctrl+C로 복사하세요.'); } break; }
+      busy(act === 'qrModalPng' ? 'QR을 만드는 중…' : '안내문을 준비하는 중…');
+      try {
+        if (act === 'qrModalPng') { const c = await qrPoster(link, title); busy(); const bl = await new Promise(r => c.toBlob(r, 'image/png')); await saveFile(String(title).replace(/[\\/:*?"<>|]/g, '').slice(0, 30) + '_QR.png', bl); }
+        else { const keep = PID; PID = m.dataset.pid || ''; const pr = call('boot'); PID = keep; const j = await pr; await printNotice(normCfg(j.cfg), j.title || title, link); busy(); } }
+      catch (e) { busy(); toast(e.message || 'QR을 만들지 못했습니다.'); }
+      break; }
+    case 'backupAll': { const a = localBooks(); const books = a.map(bk => { let o = {}; try { o = JSON.parse(LS.get(LKEY + ':' + bk.id) || '{}'); } catch (e) { } return { title: bk.title, at: bk.created, cfg: o.cfg || {}, roster: o.roster || [], sigs: o.sigs || [] }; });
+      saveFile(APP_NAME + '_모든서명철_백업_' + stampName() + '.json', new Blob([JSON.stringify({ app: 'dsign-all', ver: APP_VER, at: new Date().toISOString(), books })], { type: 'application/json' })); break; }
+    case 'qrFree': { const u = val('qr_free').trim(); if (!/^https?:\/\/\S+$/.test(u)) { toast('https:// 로 시작하는 주소를 넣어 주세요.'); return; } V.qrFree = u; render(); break; }
+    case 'qrFreePng': { if (!V.qrFree) return; busy('QR 그림을 만드는 중…'); try { const c = await qrPoster(V.qrFree, 'QR코드'); busy(); const bl = await new Promise(r => c.toBlob(r, 'image/png')); await saveFile('QR_' + stampName() + '.png', bl); } catch (e) { busy(); toast(e.message || 'QR 그림을 만들지 못했습니다.'); } break; }
+    case 'goServer3': { const u = val('lk_api3').trim(); if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) { toast('주소는 https://script.google.com/macros/s/…/exec 형태여야 합니다.'); return; } try { localStorage.setItem('dsign-api', u); } catch (e) { } location.href = location.pathname + '?api=' + encodeURIComponent(u); break; }
+    case 'goServer2': { const u = val('lk_api2').trim(); if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) { toast('주소는 https://script.google.com/macros/s/…/exec 형태여야 합니다.'); return; } try { localStorage.setItem('dsign-api', u); } catch (e) { } location.href = location.pathname + '?api=' + encodeURIComponent(u); break; }
+    case 'bkSign': PID = b.dataset.pid; bootServer(); break;
     case 'openBook': { const v = val('op_pid').trim(), m = v.match(/[?&]p=([0-9A-Za-z]+)/); PID = (m ? m[1] : v).replace(/[^0-9A-Za-z]/g, '').slice(0, 20).toUpperCase(); if (!PID) { toast('서명철 ID를 넣어 주세요.'); return; } bootServer(); break; }
     case 'createBook': {
       const title = val('nb_title').trim(), pw = val('nb_pw'), code = val('nb_code').trim(); if (!title) { toast('서명철 이름을 적어 주세요.'); return; } if (pw.length < 4) { toast('관리자 암호는 4자 이상으로 정해 주세요.'); return; } if (!code) { toast('승인 코드를 넣어 주세요.'); return; }
       busy('서명철을 만드는 중…'); const cfg = defCfg(); cfg.tpl.title = title; cfg.notice.title = title + ' 안내'; cfg.maker = maker();
-      try { PID = ''; const j = await call('create', { title, pw, code, master: code, cfg }); PID = j.pid; TOKEN = j.token; BOOK = { title: j.title, until: j.until || '' }; S = { cfg: normCfg(cfg), roster: [], sigs: [], count: 0, rosterN: 0 }; ADMIN = true; V.view = 'admin'; V.tab = 'link'; V.err = ''; toast('서명철을 만들었습니다. 아래 주소를 선생님들에게 보내세요.'); }
+      try { PID = ''; const j = await call('create', { title, pw, code, master: code, cfg }); PID = j.pid; TOKEN = j.token; BOOK = { title: j.title, until: j.until || '' }; S = { cfg: normCfg(cfg), roster: [], sigs: [], count: 0, rosterN: 0 }; ADMIN = true; V.view = 'admin'; V.tab = 'qr'; V.err = ''; V.books = undefined; syncUrl(); toast('서명철을 만들었습니다. 휴대폰 서명 QR코드가 자동으로 만들어졌습니다. 안내문·서식은 옆 탭에서 고치세요.'); }
       catch (e) { busy(); toast(e.message); return; }
       busy(); render(); break;
     }
@@ -1212,11 +1798,18 @@ async function onAct(act, b) {
     case 'ldel': { if (!ADMIN) { toast('서명철 삭제는 관리자만 할 수 있습니다.'); return; } if (!armed(b)) return; const id = b.dataset.id, a = localBooks().filter(x => x.id !== id); saveBooks(a); LS.del(LKEY + ':' + id); if (LBID === id) { LBID = ''; LS.del(LCUR); } V.rdraft = null; resetSigner(); V.tab = 'books'; render(); toast('서명철을 지웠습니다.'); break; }
     case 'preset': { const k = val('tp_preset'); if (!PRESETS[k]) { toast('불러올 서식 틀을 고르세요.'); return; } if (!armed(b)) return; S.cfg.tpl = normTpl(clone(PRESETS[k].tpl)); render(); toast('서식 틀을 불러왔습니다. 고친 뒤 [서식 설정 저장]을 누르세요.'); break; }
     case 'colUp': { readTpl(); const i = +b.dataset.i, c = S.cfg.tpl.cols; if (i > 0) { const x = c[i - 1]; c[i - 1] = c[i]; c[i] = x; } render(); break; }
-    case 'colDel': readTpl(); S.cfg.tpl.cols.splice(+b.dataset.i, 1); S.cfg.tpl = normTpl(S.cfg.tpl); render(); break;
-    case 'colAdd': { readTpl(); const ty = b.dataset.type, c = S.cfg.tpl.cols; if (ty === 'text' && c.filter(x => x.type === 'text').length >= 6) { toast('글자 칸은 6개까지 넣을 수 있습니다.'); return; } const nc = ty === 'seq' ? clone(C.seq) : ty === 'sel' ? clone(C.pos) : { k: '', type: 'text', label: '비고', w: 16 }; if (ty === 'seq') c.unshift(nc); else c.splice(Math.max(0, c.findIndex(x => x.type === 'sign')), 0, nc); S.cfg.tpl = normTpl(S.cfg.tpl); render(); break; }
+    case 'colDel': readTpl(); S.cfg.tpl.cols.splice(+b.dataset.i, 1); S.cfg.tpl = normTpl(S.cfg.tpl); if (S.cfg.tpl.pdf) V.pf = {}; render(); break;
+    case 'colAdd': { readTpl(); const ty = b.dataset.type, c = S.cfg.tpl.cols; if (ty === 'text' && c.filter(x => x.type === 'text').length >= 6) { toast('글자 칸은 6개까지 넣을 수 있습니다.'); return; } const nc = ty === 'seq' ? clone(C.seq) : ty === 'sel' ? clone(C.pos) : { k: '', type: 'text', label: S.cfg.tpl.pdf ? '새 칸' : '비고', w: 16 }; if (ty === 'seq') c.unshift(nc); else c.splice(Math.max(0, c.findIndex(x => x.type === 'sign')), 0, nc); S.cfg.tpl = normTpl(S.cfg.tpl);
+      if (S.cfg.tpl.pdf) { V.pf = {}; render(); if (ty === 'text') { const el = $('#tc_l' + (S.cfg.tpl.cols.findIndex(x => x.type === 'sign') - 1)); if (el) { el.focus(); el.select(); } } } else render(); break; }
     case 'tplPreview': readTpl(); render(); break;
     case 'layReset': if (!armed(b)) return; readTpl(); S.cfg.tpl.lay = clone(LAYD); render(); toast('여백·간격·글자 크기를 기본값으로 되돌렸습니다. [서식 설정 저장]을 눌러야 반영됩니다.'); break;
-    case 'saveTpl': readTpl(); if (await saveCfg('서식 설정을 저장했습니다.')) render(); break;
+    case 'saveTpl': { readTpl(); if (S.cfg.tpl.pdf) S.cfg.tpl.pdf.st = S.cfg.tpl.pdf.st.filter(x => x.n.trim() || x.t.trim());   /* 이름도 글자도 없는 빈 줄은 저장하지 않는다 */
+      const keep = SERVER && S.cfg.tpl.pdf ? clone(S.cfg.tpl.pdf) : null;
+      if (await saveCfg('서식 설정을 저장했습니다.')) {
+        /* PDF 서식은 서버가 그대로 간직했는지 한 번 되읽어 확인한다 */
+        if (keep) { busy('저장을 확인하는 중…'); try { await adminLoad(); } catch (e) { } busy(); if (!S.cfg.tpl.pdf) { S.cfg.tpl.pdf = keep; toast('구글 시트 서버가 PDF 서식을 저장하지 못했습니다. 서버 코드(Code.gs)가 이 기능보다 예전 판일 수 있으니 제작자에게 알려 주세요.'); } }
+        render(); }
+      break; }
     case 'rsAdd': V.rdraft.push({ id: uid('r'), name: '', position: '', mid: '', last4: '', note: '' }); render(); { const el = $('#rs_n' + (V.rdraft.length - 1)); if (el) el.focus(); } break;
     case 'rsDel': V.rdraft.splice(+b.dataset.i, 1); render(); break;
     case 'rsPasteAdd': case 'rsPasteReplace': { const L = parseRosterText(val('rs_paste')); if (!L.length) { toast('붙여 넣은 내용에서 명단을 찾지 못했습니다. 성명 칸이 있는지 확인해 주세요.'); return; } if (act === 'rsPasteReplace') { if (!armed(b)) return; V.rdraft = L; } else V.rdraft = V.rdraft.concat(L); render(); toast(`${L.length}명을 ${act === 'rsPasteReplace' ? '새 명단으로 넣었습니다' : '추가했습니다'}. [서명 대상 저장]을 눌러야 반영됩니다.`); break; }
@@ -1228,10 +1821,44 @@ async function onAct(act, b) {
       S.rosterN = S.roster.length; V.rdraft = null; render(); toast(`서명 대상을 저장했습니다 (${S.roster.length}명).${bad ? ` 끝 4자리가 없는 ${bad}명은 휴대폰 번호로 찾을 수 없습니다.` : ''}`); break;
     }
     case 'qrPng': { busy('QR 그림을 만드는 중…'); try { const c = await qrPoster(); busy(); const bl = await new Promise(r => c.toBlob(r, 'image/png')); await saveFile((BOOK.title || APP_NAME).replace(/[\\/:*?"<>|]/g, '').slice(0, 30) + '_QR.png', bl); } catch (e) { busy(); toast(e.message || 'QR 그림을 만들지 못했습니다.'); } break; }
-    case 'qrPrint': { busy('준비하는 중…'); try { const c = await qrPoster(); busy(); $('#printRoot').innerHTML = `<div class="pg" style="width:794px;height:1123px;display:flex;align-items:center;justify-content:center;background:#fff"><img src="${c.toDataURL('image/png')}" style="width:700px;height:auto"></div>`; setTimeout(() => window.print(), 80); } catch (e) { busy(); toast(e.message || '인쇄 준비를 하지 못했습니다.'); } break; }
-    case 'copyLink': { const l = signerLink(); try { await navigator.clipboard.writeText(l); toast('주소를 복사했습니다. 패들렛이나 메신저에 붙여 넣으세요.'); } catch (e) { const r = document.createRange(); r.selectNodeContents($('#linktxt')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('주소를 선택했습니다. Ctrl+C로 복사하세요.'); } break; }
-    case 'goServer': { const u = val('lk_api').trim(); if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) { toast('주소는 https://script.google.com/macros/s/…/exec 형태여야 합니다.'); return; } location.href = location.pathname + '?api=' + encodeURIComponent(u); break; }
+    case 'qrPrint': { readNotice(); busy('안내문을 준비하는 중…'); try { await printNotice(S.cfg, BOOK.title || fill(S.cfg.tpl.title, 0) || APP_NAME, signerLink()); busy(); } catch (e) { busy(); toast(e.message || '인쇄 준비를 하지 못했습니다.'); } break; }
+    case 'copyLink': { const l = signerLink(); try { await navigator.clipboard.writeText(l); toast('주소를 복사했습니다. 패들렛이나 메신저에 붙여 넣으세요.'); } catch (e) { const el = $('#linktxt') || $('.linkbox'); if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast('주소를 선택했습니다. Ctrl+C로 복사하세요.'); } break; }
+    case 'goServer': { const u = val('lk_api').trim(); if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)) { toast('주소는 https://script.google.com/macros/s/…/exec 형태여야 합니다.'); return; } try { localStorage.setItem('dsign-api', u); } catch (e) { } location.href = location.pathname + '?api=' + encodeURIComponent(u); break; }
     case 'setPw': { const pw = val('np1'); if (pw.length < 4) { toast('암호는 4자 이상으로 정해 주세요.'); return; } if (SERVER) { busy('바꾸는 중…'); try { await call('adminSetPw', { pw }); } catch (e) { busy(); toast(e.message); authLost(e); return; } busy(); } else { S.cfg.pwHash = hashPw(pw); persist('book'); LS.set('dsign-admin', hashPw(pw)); } $('#np1').value = ''; toast(SERVER ? '관리자 암호를 바꿨습니다.' : '관리자 암호를 바꿨습니다. 이 기기에서 새 서명철을 만들 때도 이 암호를 씁니다.'); break; }
+    case 'pfSel': { const near = b.dataset.near; readTpl(); V.pf = { k: b.dataset.k }; render(); if (!near) pfShow(); break; }
+    case 'pfSelSt': { readTpl(); const P = S.cfg.tpl.pdf, i = +b.dataset.i, x = P && P.st[i]; if (!x) return; if (!x.t.trim()) { render(); toast('넣을 글자를 먼저 적거나 [자동 값]에서 골라 주세요.'); return; } const near = b.dataset.near; V.pf = { st: i }; render(); if (!near) pfShow(); break; }
+    case 'pfStAdd': {
+      readTpl(); const P = S.cfg.tpl.pdf; if (!P) return; if (P.st.length >= 20) { toast('한 번만 넣는 글자는 20개까지 넣을 수 있습니다.'); return; }
+      P.st.push({ n: b.dataset.n || '', t: b.dataset.t || '', on: false }); S.cfg.tpl.pdf = normPdf(P); const i = S.cfg.tpl.pdf.st.length - 1; const quick = !!b.dataset.t; if (quick) V.pf = { st: i };
+      render(); if (quick) pfShow(); else { const el = $(`[data-ps="${i}"][data-k="n"]`); if (el) el.focus(); } break;
+    }
+    case 'pfStDel': { readTpl(); const P = S.cfg.tpl.pdf; if (!P) return; P.st.splice(+b.dataset.i, 1); V.pf = {}; render(); break; }
+    case 'pfStOff': { readTpl(); const P = S.cfg.tpl.pdf, x = P && P.st[+b.dataset.i]; if (x) x.on = false; render(); break; }
+    case 'pfUnplace': { readTpl(); const P = S.cfg.tpl.pdf; if (P) P.fields = P.fields.filter(f => f.k !== b.dataset.k); V.pf = {}; render(); break; }
+
+
+    case 'pfOff': if (!armed(b)) return; readTpl(); delete S.cfg.tpl.pdf; V.pf = null; render(); toast('기본 서식으로 돌아갔습니다. [서식 설정 저장]을 눌러야 반영됩니다.'); break;
+    case 'pfAuto': {
+      readTpl(); const P = S.cfg.tpl.pdf, f = P && P.fields.find(x => x.k !== 'st'); if (!f) { toast('먼저 첫 번째 사람의 칸을 하나 넣어 주세요.'); return; }
+      let det = null; try { det = await pfDetect(f.x + f.w / 2, f.y + f.h / 2); } catch (e) { }
+      if (!det) { toast('표 선을 찾지 못했습니다. 줄 수와 간격을 직접 넣어 주세요.'); return; }
+      P.per = det.per; P.dy = det.dy; P.blocks = det.blocks; P.dx = det.dx; S.cfg.tpl.pdf = normPdf(P); render(); toast(`아래로 ${det.per}줄${det.blocks > 1 ? ' · ' + det.blocks + '단' : ''}을 찾았습니다.`); break;
+    }
+    case 'restoreGo': { const bk = V.pend; V.pend = null; closeModal(); if (bk) await restoreServer(bk); break; }
+    case 'lmig': {
+      const a = localOnly(); if (!a.length) return;
+      await importToServer(a.map(bk => { let o = {}; try { o = JSON.parse(LS.get(LKEY + ':' + bk.id) || '{}') || {}; } catch (e) { } return { lid: bk.id, title: bk.title, cfg: o.cfg || {}, roster: o.roster || [], sigs: o.sigs || [] }; })); break;
+    }
+    case 'bakeApi': {
+      if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(API)) { toast('구글 웹 앱 주소(…/exec)로 연결된 화면에서만 만들 수 있습니다.'); return; }
+      busy('파일을 만드는 중…');
+      try {
+        const r = await fetch(location.pathname, { cache: 'no-store' }); if (!r.ok) throw new Error('x'); let tx = await r.text(); const re = /const DEFAULT_API = '[^']*';/; if (!re.test(tx)) throw new Error('x');
+        tx = tx.replace(re, "const DEFAULT_API = '" + API + "';"); busy(); let fn = 'index.html'; try { const nm = decodeURIComponent(location.pathname.split('/').pop() || ''); if (/\.html?$/i.test(nm)) fn = nm; } catch (x) { }
+        await saveFile(fn, new Blob([tx], { type: 'text/html' })); toast(`‘${fn}’ 파일을 받았습니다. GitHub 저장소 → Add file → Upload files로 올려 기존 파일을 바꾸면 됩니다.`);
+      } catch (e) { busy(); toast('이 화면에서는 파일을 만들 수 없습니다. GitHub 주소(…/sign/)로 연 화면에서 눌러 주세요.'); }
+      break;
+    }
     case 'backup': saveFile((BOOK.title || APP_NAME).replace(/[\\/:*?"<>|]/g, '').slice(0, 30) + '_백업_' + stampName() + '.json', new Blob([JSON.stringify({ app: 'dsign', ver: APP_VER, at: new Date().toISOString(), title: BOOK.title, cfg: S.cfg, roster: S.roster, sigs: S.sigs })], { type: 'application/json' })); break;
     
   }
@@ -1251,6 +1878,26 @@ document.addEventListener('input', e => {
   else if (el.dataset && el.dataset.m != null && el.dataset.k === 'w') { const s = $('#mw' + el.dataset.m); if (s) s.textContent = el.value + '%'; }
   else if (el.dataset && el.dataset.r != null && V.rdraft && V.rdraft[+el.dataset.r]) V.rdraft[+el.dataset.r][el.dataset.k] = el.value;
 });
+let lastDown = { t: 0, el: null };
+document.addEventListener('pointerdown', e => { lastDown = { t: Date.now(), el: e.target }; }, true);
+/* 화면을 다시 그린 뒤에도 방금 옮겨 간 입력칸에 그대로 머물게 한다 */
+function renderKeep() {
+  const a = document.activeElement, d = a && a.dataset, key = !a || a === document.body ? '' : a.id ? '#' + a.id : d && d.pc != null ? `[data-pc="${d.pc}"][data-k="${d.k}"]` : d && d.ps != null ? `[data-ps="${d.ps}"][data-k="${d.k}"]` : '';
+  render(); if (key) { const el = $(key); if (el) { try { el.focus(); } catch (e) { } } }
+}
+/* PDF 서식 끌어다 놓기: 서식 설정의 PDF 상자(#pfdrop)에 파일을 놓으면 올린다.
+   상자 밖에 놓은 파일은 브라우저가 그 파일을 열어 화면이 넘어가 버리지 않게 막기만 한다 */
+const dragHasFile = e => { const t = e.dataTransfer && e.dataTransfer.types; return !!t && Array.prototype.indexOf.call(t, 'Files') >= 0; };
+const dropZoneOf = e => (e.target && e.target.closest ? e.target.closest('#pfdrop') : null);
+let dropT = 0;
+const dropMark = on => { const z = $('#pfdrop'); if (z) z.classList.toggle('drag', !!on); clearTimeout(dropT); if (on) dropT = setTimeout(() => dropMark(false), 900); };
+document.addEventListener('dragover', e => { if (!dragHasFile(e)) return; e.preventDefault(); const z = dropZoneOf(e); e.dataTransfer.dropEffect = z ? 'copy' : 'none'; dropMark(!!z); });
+document.addEventListener('dragleave', e => { if (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) dropMark(false); });
+document.addEventListener('drop', async e => {
+  if (!dragHasFile(e)) return; e.preventDefault(); const z = dropZoneOf(e); dropMark(false); if (!z) return;
+  const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (!f) return;
+  await pfUpload(f, +val('pf_page') || 1);
+});
 document.addEventListener('change', async e => {
   const el = e.target;
   if (el.dataset && el.dataset.sel) { readFields(); render(); const x = $('#fx_' + el.dataset.sel); if (x) x.focus(); }
@@ -1259,7 +1906,18 @@ document.addEventListener('change', async e => {
   else if (el.id === 'md_out') { S.cfg.allowOutside = el.checked; saveCfg(el.checked ? '명단에 없는 사람도 직접 적고 서명할 수 있습니다.' : '명단에 있는 사람만 서명할 수 있습니다.'); }
   else if (el.id === 'nt_img' && el.files && el.files.length) { const fl = Array.from(el.files); el.value = ''; await addMedia(fl); }
   else if (el.id === 'rs_file' && el.files[0]) { busy('명단을 읽는 중…'); try { const L = await readRosterFile(el.files[0]); if (!L.length) toast('파일에서 명단을 찾지 못했습니다. 첫 줄에 성명·직·휴대폰 머리글을 넣어 주세요.'); else { V.rdraft = V.rdraft.concat(L); toast(`${L.length}명을 추가했습니다. [서명 대상 저장]을 눌러야 반영됩니다.`); } } catch (x) { toast(x.message || '파일을 읽지 못했습니다.'); } busy(); render(); }
-  else if (el.id === 'bk_file' && el.files[0]) { try { const o = JSON.parse(await el.files[0].text()); if (!o || o.app !== 'dsign') throw new Error('이 프로그램의 백업 파일이 아닙니다.'); const pw = S.cfg.pwHash; S.cfg = normCfg(o.cfg); S.cfg.pwHash = pw; S.roster = Array.isArray(o.roster) ? o.roster : []; S.sigs = (Array.isArray(o.sigs) ? o.sigs : []).filter(s => s && s.id && Array.isArray(s.strokes)); sortSigs(); persist('all'); V.rdraft = null; toast(`백업을 불러왔습니다. 서명 ${S.sigs.length}명 · 명단 ${S.roster.length}명`); } catch (x) { toast(x.message || '백업 파일을 읽지 못했습니다.'); } render(); }
+  else if (el.id === 'bk_all' && el.files && el.files.length) { let n = 0, last = ''; for (const f of Array.from(el.files)) { try { const r = importBackupObj(JSON.parse(await f.text())); n += r.n; last = r.lastId || last; } catch (x) { toast(`${f.name}: ${x.message || '읽지 못했습니다.'}`); } } el.value = ''; if (n) { toast(`서명철 ${n}개를 가져왔습니다.`); if (n === 1 && last) { loadLocal(last); ADMIN = true; V.view = 'admin'; V.tab = 'status'; } } V.rdraft = null; render(); }
+  else if (el.id === 'bk_file' && el.files[0]) { try { const o = JSON.parse(await el.files[0].text()); el.value = ''; if (SERVER) { askRestore(o); return; } if (!o || o.app !== 'dsign') throw new Error('이 프로그램의 백업 파일이 아닙니다.'); const pw = S.cfg.pwHash; S.cfg = normCfg(o.cfg); S.cfg.pwHash = pw; S.roster = Array.isArray(o.roster) ? o.roster : []; S.sigs = (Array.isArray(o.sigs) ? o.sigs : []).filter(s => s && s.id && Array.isArray(s.strokes)); sortSigs(); persist('all'); V.rdraft = null; toast(`백업을 불러왔습니다. 서명 ${S.sigs.length}명 · 명단 ${S.roster.length}명`); } catch (x) { toast(x.message || '백업 파일을 읽지 못했습니다.'); } render(); }
+  else if (el.id === 'bk_srv' && el.files && el.files.length) {
+    const books = []; for (const f of Array.from(el.files)) { try { const o = JSON.parse(await f.text()); if (o && o.app === 'dsign-all' && Array.isArray(o.books)) o.books.forEach(bk => books.push(bk)); else if (o && o.app === 'dsign') books.push(o); else throw new Error('이 프로그램의 백업 파일이 아닙니다.'); } catch (x) { toast(`${f.name}: ${x.message || '읽지 못했습니다.'}`); } }
+    el.value = ''; if (books.length) await importToServer(books); }
+  else if (el.id === 'pf_file' && el.files[0]) { const f = el.files[0], pno = +val('pf_page') || 1; el.value = ''; await pfUpload(f, pno); }
+  else if (el.dataset && el.dataset.ps != null && el.dataset.k === 'auto') {
+    readTpl(); const P = S.cfg.tpl.pdf, x = P && P.st[+el.dataset.ps];
+    if (x && el.value) { x.t = el.value; if (!x.n.trim()) x.n = (PF_ST.find(a => a[0] === el.value) || [])[1] || ''; } render(); }
+  else if (/^pf_(per|dy|blocks|dx)$/.test(el.id || '') || (el.dataset && el.dataset.pc != null)) {
+    /* 값을 고치고 곧바로 단추를 누른 경우에는 그 단추가 값을 읽고 화면을 다시 그리므로 여기서는 그리지 않는다 (누름이 사라지지 않게) */
+    setTimeout(() => { if (Date.now() - lastDown.t < 500 && lastDown.el && lastDown.el.closest && lastDown.el.closest('[data-act]')) return; if (!$('#pfed')) return; readTpl(); renderKeep(); }, 0); }
   
 });
 ['dragenter', 'dragover'].forEach(t => document.addEventListener(t, e => { const d = e.target.closest && e.target.closest('#nt_drop'); if (!d) return; e.preventDefault(); d.classList.add('over'); }));
@@ -1267,18 +1925,18 @@ document.addEventListener('dragleave', e => { const d = e.target.closest && e.ta
 document.addEventListener('drop', e => { const d = e.target.closest && e.target.closest('#nt_drop'); if (!d) return; e.preventDefault(); d.classList.remove('over'); const fl = Array.from((e.dataTransfer && e.dataTransfer.files) || []); if (fl.length) addMedia(fl); });
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return; const id = e.target.id;
-  if (id === 'pw1' || id === 'pw2' || id === 'pwcode') doLogin(); else if (id === 'mid') onAct('midgo'); else if (id === 'lic_code') onAct('licGo'); else if (id === 'op_pid') onAct('openBook'); else if (id === 'nb_title' || id === 'nb_pw' || id === 'nb_code') onAct('createBook'); else if (id === 'lb_title') onAct('lcreate'); else if (/^bt_/.test(id)) onAct('bRename', { dataset: { id: id.slice(3) } }); else if (/^f_|^fx_/.test(id)) toPad();
+  if (id === 'pw1' || id === 'pw2' || id === 'pwcode') doLogin(); else if (id === 'mid') onAct('midgo'); else if (id === 'lic_code') onAct('licGo'); else if (id === 'op_pid') onAct('openBook'); else if (id === 'mk_key') onAct('mkGo'); else if (id === 'qr_free') onAct('qrFree'); else if (id === 'lk_api3') onAct('goServer3'); else if (id === 'nb_title' || id === 'nb_pw' || id === 'nb_code') onAct('createBook'); else if (id === 'lb_title') onAct('lcreate'); else if (/^bt_/.test(id)) onAct('bRename', { dataset: { id: id.slice(3) } }); else if (/^f_|^fx_/.test(id)) toPad();
 });
 
 /* ---------- 시작 ---------- */
 async function bootServer() {
   V.view = 'load'; render();
-  try { const j = await call('boot'); BOOK = { title: j.title, until: '' }; S = { cfg: normCfg(j.cfg), roster: [], sigs: [], count: j.count || 0, rosterN: j.rosterN || 0 }; ADMIN = false; TOKEN = ''; resetSigner(); V.err = ''; V.view = 'intro'; }
+  try { const j = await call('boot'); BOOK = { title: j.title, until: '' }; S = { cfg: normCfg(j.cfg), roster: [], sigs: [], count: j.count || 0, rosterN: j.rosterN || 0 }; ADMIN = false; TOKEN = ''; resetSigner(); V.err = ''; V.view = 'intro'; syncUrl(); }
   catch (e) { V.err = e.message; PID = ''; V.view = 'landing'; }
   render();
 }
 if (SERVER) { if (PID) bootServer(); else { V.view = 'landing'; render(); } }
-else { const a = localBooks(), cur = LS.get(LCUR); if (cur && a.some(x => x.id === cur)) { loadLocal(cur); V.view = 'intro'; } else V.view = 'llanding'; render(); }
+else { localBooks(); V.view = 'llanding'; render(); }   /* 처음 화면은 언제나 서명철 고르기 */
 
 })();
 </script>
